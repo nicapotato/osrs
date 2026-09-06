@@ -1,6 +1,8 @@
-# osrs
+# osrs.nicapotato.com
 
 Static Old School RuneScape tools (plain HTML, CSS, and JavaScript). GitHub Pages serves the repo root.
+
+`CNAME` targets `osrs.nicapotato.com`. At the registrar, add a CNAME from `osrs` → `nicapotato.github.io` (same pattern as shaders / rocknroller). `www.nicapotato.com/osrs/` will not work — that path is the personal site, not this repo.
 
 ## Sotetseg maze trainer
 
