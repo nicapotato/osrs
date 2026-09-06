@@ -1,1 +1,8 @@
 .DS_Store
+mmg-app/node_modules
+mmg-app/dist
+*.local
+
+# Local DuckDB — not committed (Vite serves /local-data/ in mmg-app dev only)
+data/**/*.duckdb
+data/**/*.json

@@ -1,0 +1,198 @@
+/* Stone art sampled from https://oldschool.runescape.com/
+   (https://www.runescape.com/img/rsp777/bg2.jpg) */
+
+:root {
+  --osrs-yellow: #ffff00;
+  --osrs-ink: #000000;
+  --osrs-stone-light: #6a5d4a;
+  --osrs-stone-dark: #0c0a08;
+  --osrs-banner: #6b1515;
+  --pixel: "Press Start 2P", ui-monospace, monospace;
+  --frame-width: 910px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #000;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--osrs-yellow);
+  font-family: var(--pixel);
+}
+
+.home {
+  width: min(100%, var(--frame-width));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 2.25rem 5.5rem 3.25rem;
+  background: #000 url("public/bg2.jpg") center top repeat-y;
+  background-size: 100% auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.home__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.home__logo {
+  display: block;
+  width: min(100%, 34rem);
+  height: auto;
+  image-rendering: auto;
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.7));
+}
+
+.home__banner {
+  margin: 0.35rem 0 0.85rem;
+  padding: 0.55rem 1.35rem 0.45rem;
+  background: var(--osrs-banner);
+  border: 3px solid #c9a227;
+  box-shadow:
+    0 4px 0 #1c1810,
+    inset 0 2px 0 rgba(255, 220, 140, 0.25);
+  color: var(--osrs-yellow);
+  font-size: clamp(0.7rem, 2.4vw, 0.95rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  text-shadow:
+    -2px -2px 0 var(--osrs-ink),
+    2px -2px 0 var(--osrs-ink),
+    -2px 2px 0 var(--osrs-ink),
+    2px 2px 0 var(--osrs-ink),
+    0 3px 0 var(--osrs-ink);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.home__lede {
+  margin: 0;
+  max-width: 26rem;
+  color: var(--osrs-yellow);
+  font-size: clamp(0.42rem, 1.5vw, 0.55rem);
+  line-height: 2.1;
+  letter-spacing: 0.04em;
+  text-shadow: 2px 2px 0 var(--osrs-ink);
+  -webkit-font-smoothing: none;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+}
+
+.stone-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 11.5rem;
+  padding: 1.35rem 1.1rem 1.2rem;
+  color: var(--osrs-yellow);
+  text-decoration: none;
+  text-align: center;
+  background-color: #2a2118;
+  background-image:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.08), transparent 40%, rgba(0, 0, 0, 0.45)),
+    url("public/stone-button.jpg");
+  background-size: auto, cover;
+  background-position: center;
+  border-style: solid;
+  border-width: 4px;
+  border-color: var(--osrs-stone-light) var(--osrs-stone-dark) var(--osrs-stone-dark) var(--osrs-stone-light);
+  box-shadow:
+    4px 4px 0 #000,
+    inset 0 0 0 2px #1a140e;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: pointer;
+}
+
+.stone-btn:hover,
+.stone-btn:focus-visible {
+  filter: brightness(1.14);
+  outline: none;
+}
+
+.stone-btn:focus-visible {
+  box-shadow:
+    4px 4px 0 #000,
+    inset 0 0 0 2px #1a140e,
+    0 0 0 3px var(--osrs-ink),
+    0 0 0 6px var(--osrs-yellow);
+}
+
+.stone-btn:active {
+  border-color: var(--osrs-stone-dark) var(--osrs-stone-light) var(--osrs-stone-light) var(--osrs-stone-dark);
+  transform: translate(2px, 2px);
+  box-shadow:
+    2px 2px 0 #000,
+    inset 0 0 0 2px #1a140e;
+}
+
+.stone-btn__kicker,
+.stone-btn__title,
+.stone-btn__text {
+  text-transform: uppercase;
+  text-shadow:
+    -2px -2px 0 var(--osrs-ink),
+    2px -2px 0 var(--osrs-ink),
+    -2px 2px 0 var(--osrs-ink),
+    2px 2px 0 var(--osrs-ink);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.stone-btn__kicker {
+  margin-bottom: 0.7rem;
+  font-size: 0.42rem;
+  letter-spacing: 0.16em;
+  color: #ffe566;
+}
+
+.stone-btn__title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(0.58rem, 2.1vw, 0.78rem);
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+}
+
+.stone-btn__text {
+  font-size: 0.4rem;
+  line-height: 1.85;
+  letter-spacing: 0.03em;
+  color: #fff6a8;
+}
+
+@media (max-width: 720px) {
+  .home {
+    padding: 1.5rem 12vw 2.5rem;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .stone-btn {
+    min-height: 9.5rem;
+  }
+
+  .home__banner {
+    letter-spacing: 0.18em;
+  }
+}
