@@ -10,53 +10,139 @@ body,
   margin: 0;
   min-width: 320px;
   min-height: 100%;
-  background: #ffffff;
+  background: #000;
 }
 
-html:has(.osrs-mmg),
-html:has(.osrs-mmg) body,
-html:has(.osrs-mmg) #root {
+html:has(.osrs-app),
+html:has(.osrs-app) body,
+html:has(.osrs-app) #root {
   height: auto;
   min-height: 100%;
 }
 
+/* Stone column + official parchment scroll (oldschool.runescape.com .content) */
+.osrs-app {
+  --pixel: "Press Start 2P", ui-monospace, monospace;
+  --osrs-yellow: #ffff00;
+  --osrs-ink: #000000;
+  --frame-width: 1100px;
+  width: min(100%, var(--frame-width));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 0 2.5rem;
+  background: #000 url("./theme/bg2.jpg") center top repeat-y;
+  background-size: 100% auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
 .osrs-app__home {
   display: inline-block;
-  margin: 0.75rem 1.5rem 0;
-  font: 0.85rem/1.4 system-ui, sans-serif;
-  color: #0969da;
+  margin: 1rem 1.5rem 0.35rem;
+  font-family: var(--pixel);
+  font-size: 0.42rem;
+  line-height: 1.8;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--osrs-yellow);
   text-decoration: none;
+  text-shadow:
+    -2px -2px 0 var(--osrs-ink),
+    2px -2px 0 var(--osrs-ink),
+    -2px 2px 0 var(--osrs-ink),
+    2px 2px 0 var(--osrs-ink);
 }
 
 @media (max-width: 640px) {
   .osrs-app__home {
-    margin: 0.65rem 0.65rem 0;
+    margin: 0.75rem 0.85rem 0.2rem;
   }
 }
 
-.osrs-app__home:hover {
-  text-decoration: underline;
+.osrs-app__home:hover,
+.osrs-app__home:focus-visible {
+  filter: brightness(1.12);
+  outline: none;
+}
+
+.osrs-app__scroll {
+  position: relative;
+  margin: 0.5rem 0.85rem 0;
+  padding: 3.15rem 1.65rem 3.4rem;
+  background: url("./theme/scroll-middle.gif") repeat-y top center;
+  background-size: 100% auto;
+  color: #1a1208;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.osrs-app__scroll::before,
+.osrs-app__scroll::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.osrs-app__scroll::before {
+  top: -11px;
+  background-image: url("./theme/scroll-top.gif");
+}
+
+.osrs-app__scroll::after {
+  top: auto;
+  bottom: -11px;
+  background-image: url("./theme/scroll-bottom.gif");
+  background-position: center bottom;
 }
 
 .osrs-mmg {
-  --osrs-bg: #ffffff;
-  --osrs-surface: #ffffff;
-  --osrs-text: #1f2328;
-  --osrs-text-muted: rgba(31, 35, 40, 0.65);
-  --osrs-border: #d0d7de;
-  --osrs-btn-bg: #ffffff;
-  --osrs-btn-text: #1f2328;
-  --osrs-link: #0969da;
+  --pixel: "Press Start 2P", ui-monospace, monospace;
+  --osrs-bg: transparent;
+  --osrs-surface: rgba(244, 234, 208, 0.55);
+  --osrs-text: #1a1208;
+  --osrs-text-strong: #1a1208;
+  --osrs-text-muted: #5c4a32;
+  --osrs-border: #c4b089;
+  --osrs-border-strong: #8a7048;
+  --osrs-btn-bg: #f4ead0;
+  --osrs-btn-text: #1a1208;
+  --osrs-btn-hover: #e8d9b0;
+  --osrs-btn-active-bg: #f3e2a0;
+  --osrs-btn-active-border: #7b4f17;
+  --osrs-link: #7b4f17;
+  --osrs-link-hover: #5a3810;
   --osrs-stale-banner-bg: #ffde44;
   --osrs-stale-banner-text: #0d0d0d;
-  --osrs-header-bg: #f6f8fa;
+  --osrs-header-bg: #efe3c4;
 
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1.5rem 1.5rem 0.5rem;
+  max-width: none;
+  margin: 0;
+  padding: 0;
   color: var(--osrs-text);
-  background: var(--osrs-bg);
+  background: transparent;
+  font-family: Georgia, "Palatino Linotype", Palatino, "Times New Roman", serif;
+}
+
+.osrs-mmg button,
+.osrs-mmg input,
+.osrs-mmg select {
   font-family: system-ui, sans-serif;
+}
+
+.osrs-mmg a {
+  color: var(--osrs-link);
+}
+
+.osrs-mmg a:hover {
+  color: var(--osrs-link-hover);
 }
 
 .osrs-mmg > :last-child {
@@ -69,8 +155,12 @@ html:has(.osrs-mmg) #root {
 
 .osrs-mmg__header h1 {
   margin: 0 0 0.35rem;
-  font-size: 1.6rem;
-  color: #0d1117;
+  font-family: var(--pixel);
+  font-size: clamp(0.58rem, 1.8vw, 0.78rem);
+  line-height: 1.65;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--osrs-text-strong);
 }
 
 .osrs-mmg__header p {
@@ -137,6 +227,14 @@ html:has(.osrs-mmg) #root {
   white-space: nowrap;
 }
 
+.osrs-mmg--calculator .osrs-mmg__header h1 {
+  font-family: Georgia, "Palatino Linotype", Palatino, "Times New Roman", serif;
+  font-size: 1.45rem;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .osrs-mmg__header--compact h1 {
   margin-bottom: 0.2rem;
 }
@@ -174,8 +272,8 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__btn:hover:not(:disabled) {
-  background: #eaeef2;
-  border-color: #afb8c1;
+  background: var(--osrs-btn-hover);
+  border-color: var(--osrs-border-strong);
 }
 
 .osrs-mmg__btn--ghost {
@@ -183,9 +281,9 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__btn--active {
-  background: #ddf4ff;
-  border-color: #54aeff;
-  color: #0550ae;
+  background: var(--osrs-btn-active-bg);
+  border-color: var(--osrs-btn-active-border);
+  color: var(--osrs-link-hover);
 }
 
 .osrs-mmg__btn:disabled {
@@ -222,7 +320,7 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__profile-trigger:hover {
-  background: #eaeef2;
+  background: var(--osrs-btn-hover);
 }
 
 .osrs-mmg__profile-trigger-name {
@@ -325,7 +423,7 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__profile-dropdown-actions button:hover:not(:disabled) {
-  background: #eaeef2;
+  background: var(--osrs-btn-hover);
 }
 
 .osrs-mmg__profile-dropdown-actions button:disabled {
@@ -572,7 +670,7 @@ html:has(.osrs-mmg) #root {
 
 .osrs-mmg__summary strong {
   font-size: 1.1rem;
-  color: #0d1117;
+  color: var(--osrs-text-strong);
 }
 
 .osrs-mmg__metric--profit-up {
@@ -603,12 +701,12 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__metric--outputs {
-  background: #ddf4ff;
-  border-color: #54aeff;
+  background: var(--osrs-btn-active-bg);
+  border-color: var(--osrs-btn-active-border);
 }
 
 .osrs-mmg__metric--outputs strong {
-  color: #0969da;
+  color: var(--osrs-link);
 }
 
 .osrs-mmg__metric--margin-good {
@@ -670,16 +768,16 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__panel {
-  background: var(--osrs-surface);
-  border: 1px solid var(--osrs-border);
-  border-radius: 0.5rem;
+  background: rgba(244, 234, 208, 0.45);
+  border: 1px solid var(--osrs-border-strong);
+  border-radius: 0;
   padding: 0.85rem;
-  box-shadow: 0 1px 4px rgba(31, 35, 40, 0.1);
+  box-shadow: none;
 }
 
 .osrs-mmg__panel h3 {
   margin: 0 0 0.65rem;
-  color: #0d1117;
+  color: var(--osrs-text-strong);
 }
 
 .osrs-mmg__panel.osrs-mmg__trends {
@@ -697,7 +795,7 @@ html:has(.osrs-mmg) #root {
   margin: 0 0 0.35rem;
   font-size: 0.88rem;
   font-weight: 600;
-  color: #0d1117;
+  color: var(--osrs-text-strong);
 }
 
 .osrs-mmg__chart {
@@ -724,7 +822,7 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__chart .recharts-legend-item-text {
-  color: #1f2328 !important;
+  color: var(--osrs-text) !important;
 }
 
 .osrs-mmg__skills {
@@ -734,7 +832,7 @@ html:has(.osrs-mmg) #root {
 .osrs-mmg__skills h3 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-  color: #0d1117;
+  color: var(--osrs-text-strong);
 }
 
 .osrs-mmg__skills-list {
@@ -812,12 +910,16 @@ html:has(.osrs-mmg) #root {
   box-shadow: 0 1px 0 var(--osrs-border);
 }
 
+.osrs-mmg__table tbody tr:nth-child(even) {
+  background: rgba(60, 39, 11, 0.06);
+}
+
 .osrs-mmg__table-scroll {
   overflow: auto;
   margin-bottom: 1rem;
-  border: 1px solid var(--osrs-border);
-  border-radius: 0.5rem;
-  background: var(--osrs-surface);
+  border: 1px solid var(--osrs-border-strong);
+  border-radius: 0;
+  background: rgba(255, 250, 235, 0.35);
 }
 
 .osrs-mmg__table-scroll--wide .osrs-mmg__table--rankings {
@@ -845,7 +947,7 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__table--rankings a:hover {
-  color: #0550ae;
+  color: var(--osrs-link-hover);
   text-decoration: underline;
 }
 
@@ -910,7 +1012,7 @@ html:has(.osrs-mmg) #root {
 .osrs-mmg__progress-bar {
   height: 100%;
   border-radius: inherit;
-  background: #0969da;
+  background: #7b4f17;
   transition: width 0.15s ease-out;
 }
 
@@ -959,18 +1061,18 @@ html:has(.osrs-mmg) #root {
 .osrs-mmg__rerank-row button:hover,
 .osrs-mmg__period-row button:hover,
 .osrs-mmg__kph-row button:hover {
-  background: #eaeef2;
-  border-color: #afb8c1;
+  background: var(--osrs-btn-hover);
+  border-color: var(--osrs-border-strong);
 }
 
 .osrs-mmg__banner--stale button {
   border-color: #0d0d0d;
-  background: #ffffff;
+  background: #fff8dc;
   color: #0d0d0d;
 }
 
 .osrs-mmg__banner--stale button:hover {
-  background: #f6f8fa;
+  background: var(--osrs-btn-hover);
 }
 
 .osrs-mmg__banner button:disabled,
@@ -1125,7 +1227,7 @@ html:has(.osrs-mmg) #root {
   padding: 0.15rem 0.2rem;
   border: none;
   background: none;
-  color: #1f2328;
+  color: var(--osrs-text);
   font-size: 0.78rem;
   cursor: pointer;
 }
@@ -1166,8 +1268,8 @@ html:has(.osrs-mmg) #root {
 }
 
 .osrs-mmg__chart-legend-reset:hover {
-  background: #eaeef2;
-  border-color: #afb8c1;
+  background: var(--osrs-btn-hover);
+  border-color: var(--osrs-border-strong);
 }
 
 .osrs-mmg__chart-tooltip {
@@ -1471,13 +1573,21 @@ html:has(.osrs-mmg) #root {
 }
 
 @media (max-width: 640px) {
+  .osrs-app__scroll {
+    margin: 0.35rem 0.35rem 0;
+    padding: 2.6rem 0.75rem 2.85rem;
+  }
+
   .osrs-mmg {
-    padding: 0.65rem 0.65rem 0.5rem;
-    padding-left: max(0.65rem, env(safe-area-inset-left));
-    padding-right: max(0.65rem, env(safe-area-inset-right));
+    padding: 0;
   }
 
   .osrs-mmg__header h1 {
+    font-size: 0.52rem;
+    line-height: 1.7;
+  }
+
+  .osrs-mmg--calculator .osrs-mmg__header h1 {
     font-size: 1.15rem;
     line-height: 1.3;
   }

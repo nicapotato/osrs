@@ -13,17 +13,21 @@ function PageFallback() {
 export function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <a className="osrs-app__home" href="/">
-        ← OSRS tools
-      </a>
-      <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route path="/" element={<OsrsMmgRankingsPage />} />
-          <Route path="/m/:methodId" element={<OsrsMmgCalculatorPage />} />
-          <Route path="/c" element={<OsrsCharacterPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
+      <div className="osrs-app">
+        <a className="osrs-app__home" href="/">
+          ← OSRS tools
+        </a>
+        <div className="osrs-app__scroll">
+          <Suspense fallback={<PageFallback />}>
+            <Routes>
+              <Route path="/" element={<OsrsMmgRankingsPage />} />
+              <Route path="/m/:methodId" element={<OsrsMmgCalculatorPage />} />
+              <Route path="/c" element={<OsrsCharacterPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </div>
+      </div>
       <Toaster richColors position="top-center" />
     </BrowserRouter>
   );

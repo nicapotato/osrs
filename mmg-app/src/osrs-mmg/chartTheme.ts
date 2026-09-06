@@ -1,14 +1,14 @@
 export const OSRS_CHART_THEME = {
-  grid: "#d0d7de",
-  axis: "#57606a",
-  legendText: "#1f2328",
+  grid: "#c4b089",
+  axis: "#5c4a32",
+  legendText: "#1a1208",
   percentileBand: "rgba(207, 34, 46, 0.28)",
-  medianLine: "#0d1117",
+  medianLine: "#3c270b",
   volumeLine: "#bf8700",
   tooltip: {
-    background: "#ffffff",
-    border: "#d0d7de",
-    text: "#1f2328",
+    background: "#f4ead0",
+    border: "#8a7048",
+    text: "#1a1208",
   },
   colors: [
     "#0969da",
