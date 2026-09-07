@@ -116,3 +116,7 @@ export function periodXAxisProps(granularity: PeriodGranularity) {
 export function comparePeriodKeys(a: string, b: string): number {
   return toIsoDate(a).localeCompare(toIsoDate(b));
 }
+
+export function periodButtonLabel(period: PeriodGranularity): string {
+  return period.charAt(0).toUpperCase() + period.slice(1);
+}

@@ -1,15 +1,379 @@
+.sote {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sote__top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 0.65rem;
+}
+
+.sote__text-btn {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--osrs-yellow);
+  font-family: var(--pixel);
+  font-size: 0.42rem;
+  line-height: 1.8;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+.sote__top-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.85rem;
+}
+
+.sote__text-btn:hover,
+.sote__text-btn:focus-visible {
+  filter: brightness(1.12);
+  outline: none;
+}
+
+.sote__header {
+  width: 100%;
+  margin-bottom: 1.1rem;
+}
+
+.sote__title,
+.sote__lede {
+  color: var(--osrs-yellow);
+  text-shadow: none;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sote__title {
+  margin: 0 0 0.7rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  font-size: clamp(0.7rem, 2.4vw, 0.95rem);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.sote__lede {
+  margin: 0;
+  max-width: 26rem;
+  font-size: clamp(0.42rem, 1.5vw, 0.55rem);
+  line-height: 2.1;
+  letter-spacing: 0.04em;
+}
+
+.sote__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  width: 100%;
+  margin: 0 0 0.85rem;
+}
+
+.sote__stat {
+  min-height: 4.4rem;
+  padding: 0.7rem 0.55rem 0.65rem;
+  text-align: center;
+  background-color: #2a2118;
+  background-image:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.08), transparent 40%, rgba(0, 0, 0, 0.45)),
+    url("../public/stone-button.jpg");
+  background-size: auto, cover;
+  background-position: center;
+  border-style: solid;
+  border-width: 4px;
+  border-color: var(--osrs-stone-light) var(--osrs-stone-dark) var(--osrs-stone-dark) var(--osrs-stone-light);
+  box-shadow:
+    4px 4px 0 #000,
+    inset 0 0 0 2px #1a140e;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.sote__stat-kicker,
+.sote__stat-value,
+.sote__note {
+  text-transform: uppercase;
+  text-shadow:
+    -2px -2px 0 var(--osrs-ink),
+    2px -2px 0 var(--osrs-ink),
+    -2px 2px 0 var(--osrs-ink),
+    2px 2px 0 var(--osrs-ink);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sote__stat-kicker {
+  display: block;
+  margin-bottom: 0.55rem;
+  color: #ffe566;
+  font-size: 0.38rem;
+  letter-spacing: 0.16em;
+}
+
+.sote__stat-value {
+  display: block;
+  color: var(--osrs-yellow);
+  font-size: clamp(0.38rem, 1.4vw, 0.48rem);
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.03em;
+  word-break: break-word;
+}
+
+.sote__stat-sep {
+  color: var(--osrs-yellow);
+}
+
+.sote__meter--good {
+  color: #3cff3c;
+}
+
+.sote__meter--ok {
+  color: #ffff00;
+}
+
+.sote__meter--bad {
+  color: #ff4a3c;
+}
+
+.sote__stat .sote__seed-input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.2rem 0.15rem;
+  border: 0;
+  background: transparent;
+  color: #fff6a8;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-align: center;
+  text-transform: none;
+  text-shadow: none;
+  outline: none;
+}
+
+.sote__stat .sote__seed-input:focus-visible {
+  color: var(--osrs-yellow);
+  box-shadow: 0 2px 0 var(--osrs-yellow);
+}
+
+.sote__stat .sote__seed-input.is-invalid {
+  color: #ff4a3c;
+  box-shadow: 0 2px 0 #ff4a3c;
+}
+
+.sote__note {
+  width: 100%;
+  margin: -0.15rem 0 0.85rem;
+  color: #ffb347;
+  font-size: 0.4rem;
+  line-height: 1.8;
+  text-align: center;
+}
+
+.sote__note[hidden] {
+  display: none;
+}
+
+.sote__maze {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 0 1.1rem;
+  padding: 0.55rem;
+  background: #0c0a08;
+  border-style: solid;
+  border-width: 4px;
+  border-color: var(--osrs-stone-light) var(--osrs-stone-dark) var(--osrs-stone-dark) var(--osrs-stone-light);
+  box-shadow:
+    4px 4px 0 #000,
+    inset 0 0 0 2px #1a140e;
+}
+
 #sotetseg-maze {
   display: block;
-  margin: 0 auto;
+  max-width: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
-.canvas-wrapper {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 99%; // temporary fix to remove horiz scrollbar... will have to fix properly eventually
+.sote__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
 }
 
-.canvas-wrapper-parent {
-  transform-style: preserve-3d;
+.stone-btn--compact {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  min-width: 7.5rem;
+  padding: 0.75rem 0.7rem 0.65rem;
+  font-family: var(--pixel);
+  font-size: 0.42rem;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow:
+    -2px -2px 0 var(--osrs-ink),
+    2px -2px 0 var(--osrs-ink),
+    -2px 2px 0 var(--osrs-ink),
+    2px 2px 0 var(--osrs-ink);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sote-dialog {
+  width: min(34rem, calc(100vw - 1.5rem));
+  padding: 1.2rem 1.05rem 1rem;
+  color: var(--osrs-yellow);
+  font-family: var(--pixel);
+  background-color: #2a2118;
+  background-image:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.08), transparent 40%, rgba(0, 0, 0, 0.5)),
+    url("../public/stone-button.jpg");
+  background-size: auto, cover;
+  border-style: solid;
+  border-width: 4px;
+  border-color: var(--osrs-stone-light) var(--osrs-stone-dark) var(--osrs-stone-dark) var(--osrs-stone-light);
+  box-shadow:
+    6px 6px 0 #000,
+    inset 0 0 0 2px #1a140e;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.sote-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.sote-dialog h2,
+.sote-dialog p,
+.sote-dialog li,
+.sote-dialog label {
+  text-shadow:
+    -2px -2px 0 var(--osrs-ink),
+    2px -2px 0 var(--osrs-ink),
+    -2px 2px 0 var(--osrs-ink),
+    2px 2px 0 var(--osrs-ink);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sote-dialog h2 {
+  margin: 0 0 0.9rem;
+  color: var(--osrs-yellow);
+  font-size: clamp(0.52rem, 2vw, 0.7rem);
+  line-height: 1.55;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.sote-dialog p,
+.sote-dialog li,
+.sote-dialog label {
+  color: #fff6a8;
+  font-size: 0.4rem;
+  line-height: 1.9;
+  letter-spacing: 0.03em;
+}
+
+.sote-dialog p {
+  margin: 0 0 0.75rem;
+}
+
+.sote-dialog ol {
+  margin: 0 0 0.85rem;
+  padding-left: 1.35rem;
+}
+
+.sote-dialog li + li {
+  margin-top: 0.45rem;
+}
+
+.sote-dialog__label {
+  display: block;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+}
+
+.sote-dialog input {
+  width: 100%;
+  margin-bottom: 0.7rem;
+  padding: 0.55rem 0.5rem;
+  color: var(--osrs-yellow);
+  font-family: var(--pixel);
+  font-size: 0.4rem;
+  letter-spacing: 0.04em;
+  background: #0c0a08;
+  border-style: solid;
+  border-width: 3px;
+  border-color: var(--osrs-stone-dark) var(--osrs-stone-light) var(--osrs-stone-light) var(--osrs-stone-dark);
+  outline: none;
+}
+
+.sote-dialog input:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--osrs-ink),
+    0 0 0 4px var(--osrs-yellow);
+}
+
+.sote-dialog__error {
+  color: #ff6b4a;
+}
+
+.sote-dialog__error[hidden] {
+  display: none;
+}
+
+.sote-dialog__menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+@media (max-width: 720px) {
+  .sote__top-links {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .sote__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .sote__stat {
+    min-height: 0;
+  }
+
+  .stone-btn--compact {
+    flex: 1 1 calc(50% - 0.55rem);
+    min-width: 0;
+  }
 }

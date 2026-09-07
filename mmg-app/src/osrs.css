@@ -153,6 +153,27 @@ html:has(.osrs-app) #root {
   margin-bottom: 0;
 }
 
+.osrs-mmg__header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.osrs-mmg__header-row h1 {
+  margin: 0;
+  min-width: 0;
+}
+
+.osrs-mmg__header-nav {
+  display: flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.85rem;
+}
+
 .osrs-mmg__header h1 {
   margin: 0 0 0.35rem;
   font-family: var(--pixel);
@@ -235,8 +256,12 @@ html:has(.osrs-app) #root {
   text-transform: none;
 }
 
-.osrs-mmg__header--compact h1 {
+.osrs-mmg__header--compact .osrs-mmg__header-row {
   margin-bottom: 0.2rem;
+}
+
+.osrs-mmg__header--compact h1 {
+  margin-bottom: 0;
 }
 
 .osrs-mmg__header--compact p {
@@ -692,21 +717,21 @@ html:has(.osrs-app) #root {
 }
 
 .osrs-mmg__metric--inputs {
+  background: #ffebe9;
+  border-color: #ff8182;
+}
+
+.osrs-mmg__metric--inputs strong {
+  color: #cf222e;
+}
+
+.osrs-mmg__metric--outputs {
   background: #fff8c5;
   border-color: #d4a72c;
 }
 
-.osrs-mmg__metric--inputs strong {
-  color: #9a6700;
-}
-
-.osrs-mmg__metric--outputs {
-  background: var(--osrs-btn-active-bg);
-  border-color: var(--osrs-btn-active-border);
-}
-
 .osrs-mmg__metric--outputs strong {
-  color: var(--osrs-link);
+  color: #9a6700;
 }
 
 .osrs-mmg__metric--margin-good {
@@ -1599,8 +1624,16 @@ html:has(.osrs-app) #root {
     line-height: 1.35;
   }
 
+  .osrs-mmg__header-row {
+    flex-wrap: wrap;
+  }
+
+  .osrs-mmg__header-nav {
+    width: 100%;
+  }
+
   .osrs-mmg__header--compact h1 {
-    margin-bottom: 0.15rem;
+    margin-bottom: 0;
   }
 
   .osrs-mmg__banner {

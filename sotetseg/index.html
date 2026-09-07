@@ -1,32 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>Sotetseg Maze Trainer</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<meta charset="utf-8"/>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Practice Sotetseg maze paths against the tick timer." />
+	<title>Sotetseg maze trainer</title>
+	<link rel="icon" type="image/png" href="../public/osrs-logo.png" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="../landing.css" />
+	<link rel="stylesheet" href="style.css?v=4" />
 </head>
-<body onresize="resize()">
-<div class="center-wrapper-parent">
-	<div class="canvas-wrapper">
-		<p align="center">
-			<a href="../index.html">← OSRS tools</a>
-		</p>
-		<p align="center">
-			<button onclick="showInstructions()">Instructions</button>
-			<button onclick="showAbout()">About (v0.9)</button>
-		</p>
-		<div id="par" align="center">Best possible time: 0.0 seconds (0 ticks)</div>
-		<div id="timer" align="center">Your time: 0.0 seconds (0 ticks, 0 stalled)</div>
-		<p align="center"></p>
-		<canvas id="sotetseg-maze" tabindex="1"></canvas>
-		<p align="center">
-			<button onclick="reset()">Reset</button>
-			<button onclick="newSession()">New Maze</button>
-			<button onclick="showSolution()">Show Solution</button>
-			<button onclick="editSeed()">Edit Seed</button>
-		</p>
-	</div>
-</div>
-<script type="text/javascript" src="sotetseg.js"></script>
+<body>
+	<main class="home sote">
+		<header class="sote__top">
+			<div class="sote__top-links">
+				<a class="sote__text-btn" href="/">Home</a>
+				<button type="button" class="sote__text-btn" id="btn-instructions">Instructions</button>
+				<button type="button" class="sote__text-btn" id="btn-about">About</button>
+			</div>
+		</header>
+		<header class="home__header sote__header">
+			<h1 class="sote__title">Sotetseg maze</h1>
+		</header>
+		<div class="sote__maze" id="sote-maze-host">
+			<canvas id="sotetseg-maze" tabindex="0"></canvas>
+		</div>
+		<section class="sote__stats" aria-label="Run status">
+			<div class="sote__stat">
+				<span class="sote__stat-kicker">Best</span>
+				<strong class="sote__stat-value" id="par">0.0s · 0 ticks</strong>
+			</div>
+			<div class="sote__stat">
+				<span class="sote__stat-kicker">You</span>
+				<strong class="sote__stat-value" id="timer">
+					<span class="sote__meter" id="timer-seconds">0.0s</span>
+					<span class="sote__stat-sep"> · </span>
+					<span class="sote__meter" id="timer-ticks">0 ticks</span>
+					<span class="sote__stat-sep"> · </span>
+					<span class="sote__meter" id="timer-stalled">0 stalled</span>
+				</strong>
+			</div>
+			<div class="sote__stat">
+				<span class="sote__stat-kicker">Seed</span>
+				<input
+					class="sote__seed-input"
+					id="seed"
+					type="text"
+					inputmode="numeric"
+					autocomplete="off"
+					spellcheck="false"
+					maxlength="16"
+					aria-label="Maze seed, eight values from 00 to 13"
+				/>
+			</div>
+		</section>
+		<p class="sote__note" id="timer-note" hidden></p>
+		<nav class="sote__actions" aria-label="Maze controls">
+			<button type="button" class="stone-btn stone-btn--compact" id="btn-reset">Reset</button>
+			<button type="button" class="stone-btn stone-btn--compact" id="btn-new">New maze</button>
+			<button type="button" class="stone-btn stone-btn--compact" id="btn-solution">Solution</button>
+		</nav>
+	</main>
+
+	<dialog class="sote-dialog" id="dialog-instructions">
+		<form method="dialog">
+			<h2>Instructions</h2>
+			<ol>
+				<li>Start on the first tile. Your character waits one tile south.</li>
+				<li>Finish on the last tile.</li>
+				<li>Do not damage teammates. Mistakes are marked red.</li>
+				<li>A stall paints the tile yellow.</li>
+			</ol>
+			<p>Movement matches Old School RuneScape and resolves every tick (600ms).</p>
+			<p>White circles are your position each tick. Blue numbers are your path. Orange numbers are one optimal path.</p>
+			<p>There can be more than one optimal path. Making par is enough.</p>
+			<menu class="sote-dialog__menu">
+				<button type="submit" class="stone-btn stone-btn--compact" value="close">Close</button>
+			</menu>
+		</form>
+	</dialog>
+
+	<dialog class="sote-dialog" id="dialog-about">
+		<form method="dialog">
+			<h2>About v0.9</h2>
+			<p>Copied from deon9718/deon9718.github.io. Suggestions: qhp on Discord.</p>
+			<p>Thanks to Ardames, De0, and Hato for mechanics advice.</p>
+			<p>Thanks to Deflne_Alive, LucidDream, SNIPERBDS, xZact, and WeDoRaids for mazes used to set generation rules.</p>
+			<menu class="sote-dialog__menu">
+				<button type="submit" class="stone-btn stone-btn--compact" value="close">Close</button>
+			</menu>
+		</form>
+	</dialog>
+
+	<script src="sotetseg.js?v=4"></script>
 </body>
 </html>

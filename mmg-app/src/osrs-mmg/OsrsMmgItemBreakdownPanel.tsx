@@ -19,9 +19,9 @@ import {
 } from "./duckdbQueries";
 import { fetchMethodItemMetricsFromGeApi } from "./gePricesApi";
 import { buildItemBreakdownChartData, OTHER_SERIES_KEY, type BreakdownSeries } from "./itemBreakdown";
-import { calcAtKph, formatGp, formatGpCompact, formatShare, formatUnitCost, listBreakdownLines } from "./mmgCalc";
+import { calcAtKph, formatGp, formatGpCompact, formatQty, formatShare, formatUnitCost, listBreakdownLines } from "./mmgCalc";
 import { OsrsMmgChartLegend, useChartLegendVisibility, type ChartLegendItem } from "./OsrsMmgChartLegend";
-import { comparePeriodKeys, formatPeriodTooltipLabel, periodXAxisProps } from "./periodFormat";
+import { comparePeriodKeys, formatPeriodTooltipLabel, periodButtonLabel, periodXAxisProps } from "./periodFormat";
 import type { BreakdownIoType, MmgGuide, PeriodGranularity } from "./types";
 
 type Props = {
@@ -396,7 +396,7 @@ export function OsrsMmgItemBreakdownPanel({ methodId, guide, kph }: Props) {
                       <td>{formatUnitCost(line)}</td>
                       <td>{formatGp(line.gpPerHour)}</td>
                       <td>{formatShare(line.gpPerHour, sideTotal)}</td>
-                      <td>{line.qtyPerHour.toLocaleString("en-GB", { maximumFractionDigits: 2 })}</td>
+                      <td>{formatQty(line.qtyPerHour)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -412,7 +412,7 @@ export function OsrsMmgItemBreakdownPanel({ methodId, guide, kph }: Props) {
                 className={p === period ? "is-active" : ""}
                 onClick={() => setPeriod(p)}
               >
-                {p}
+                {periodButtonLabel(p)}
               </button>
             ))}
             <div className="osrs-mmg__date-range">

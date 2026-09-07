@@ -132,8 +132,13 @@ export default function OsrsMmgCalculatorPage() {
   return (
     <div className="osrs-mmg osrs-mmg--calculator">
       <header className="osrs-mmg__header">
-        <p><Link to="/">← Rankings</Link></p>
-        <h1>{formatWikiPlainText(activeGuide.methodName)}</h1>
+        <div className="osrs-mmg__header-row">
+          <h1>{formatWikiPlainText(activeGuide.methodName)}</h1>
+          <nav className="osrs-mmg__header-nav" aria-label="Page links">
+            <Link to="/">← Rankings</Link>
+            <a href="/">Home</a>
+          </nav>
+        </div>
         <p>Adjust completions per hour using the same math as the OSRS Wiki mmgkc gadget.</p>
       </header>
 

@@ -14,9 +14,6 @@ export function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <div className="osrs-app">
-        <a className="osrs-app__home" href="/">
-          ← OSRS tools
-        </a>
         <div className="osrs-app__scroll">
           <Suspense fallback={<PageFallback />}>
             <Routes>

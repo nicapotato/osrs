@@ -14,7 +14,7 @@ import {
 import { axisTick, chartMargin, legendProps, OSRS_CHART_THEME, tooltipProps } from "./chartTheme";
 import { fetchTopNComparison, fetchTrendSeries } from "./duckdbQueries";
 import { formatGp } from "./mmgCalc";
-import { comparePeriodKeys, formatPeriodTooltipLabel, periodXAxisProps, toIsoDate } from "./periodFormat";
+import { comparePeriodKeys, formatPeriodTooltipLabel, periodButtonLabel, periodXAxisProps, toIsoDate } from "./periodFormat";
 import { formatWikiPlainText } from "./wikiText";
 import type { MethodRankRow, PeriodGranularity, TrendPoint } from "./types";
 
@@ -146,7 +146,7 @@ export function OsrsMmgTrendsPanel({
               className={p === period ? "is-active" : ""}
               onClick={() => setPeriod(p)}
             >
-              {p}
+              {periodButtonLabel(p)}
             </button>
           ))}
         </div>

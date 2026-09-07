@@ -1,22 +1,11 @@
 /* This code is pretty sloppy right now. Sorry for the mess. */
 
 function showAbout() {
-	alert("Feel free to message suggestions to me on discord at qhp#5615.\n\n" +
-		"- Special thanks to Ardames, De0, and Hato for advice on the game's mechanics.\n" +
-		"- Additional thanks to Deflne_Alive, LucidDream, SNIPERBDS, xZact, and the WeDoRaids discord for sharing mazes from which I could establish rules for maze generation.");
+	document.getElementById("dialog-about").showModal();
 }
 
 function showInstructions() {
-	alert(
-		"1. You must start on the first tile (your character waits 1 tile south).\n" +
-		"2. You must finish on the last tile.\n" +
-		"3. You must not damage any of your teammates (mistakes marked red).\n" +
-		"4. If you don't move for a tick, the tile you stall on is colored yellow.\n\n" +
-		"Movement mechanics work just as they do in OSRS and are processed every tick (600ms).\n" +
-		"White circles show where your character existed each tick while traversing the maze.\n" +
-		"Blue numbers show your path, while orange numbers show the calculated optimal path.\n" +
-		"There may be more than one optimal path, so as long as you're making par you're doing great!"
-	);
+	document.getElementById("dialog-instructions").showModal();
 }
 
 const tick_length  = 600;
@@ -67,18 +56,25 @@ class Point {
 }
 
 function resize() {
-	let viewport_height = window.innerHeight;
-	let viewport_width = window.innerWidth;
-
-	if (viewport_width / viewport_height < 0.77) {
-		if (viewport_width < 620) {
-			tile_size = (viewport_width - 20)/maze_width; // 30 is just buffer space
-		}
-	} else {
-		if (viewport_height < 800) {
-			tile_size = (viewport_height - 200)/maze_height; // 200 is buffer space for the buttons/text above/below the maze
-		}
-	}
+	const page = document.querySelector(".sote");
+	const mazeHost = document.getElementById("sote-maze-host");
+	const actions = document.querySelector(".sote__actions");
+	const stats = document.querySelector(".sote__stats");
+	const pageStyle = page ? getComputedStyle(page) : null;
+	const padX = pageStyle
+		? parseFloat(pageStyle.paddingLeft) + parseFloat(pageStyle.paddingRight)
+		: 32;
+	const availableW = (page ? page.clientWidth : window.innerWidth) - padX - 24;
+	const mazeTop = mazeHost ? mazeHost.getBoundingClientRect().top : 180;
+	const actionsH = actions ? actions.getBoundingClientRect().height : 72;
+	const statsH = stats ? stats.getBoundingClientRect().height : 80;
+	const availableH = window.innerHeight - mazeTop - actionsH - statsH - 48;
+	const next = Math.floor(Math.min(
+		40,
+		availableW / maze_width,
+		Math.max(availableH, 280) / maze_height
+	));
+	tile_size = Math.max(22, next);
 
 	tile_stroke  = tile_size/25;
 	solv_fontsize  = 15*(tile_size/40);
@@ -86,7 +82,7 @@ function resize() {
 	offset_user    = -offset_optimal;
 
 	canvas.width = tile_size * maze_width;
-	canvas.height = tile_size * (maze_height); // need +1 for the extra row at the top to run off the maze, if desired.
+	canvas.height = tile_size * maze_height;
 
 	drawState();
 }
@@ -433,17 +429,46 @@ function getNextPathTile(c_pos, o_pos) {
 	return null;
 }
 
-function editSeed() {
-	let savestate = prompt("Enter a seed", seed.join(" "));
-	if (!savestate) {
+function formatSeed(values) {
+	return values.map((n) => String(n).padStart(2, "0")).join("");
+}
+
+function parseSeed(raw) {
+	const compact = raw.replace(/\D/g, "");
+	if (compact.length === path_turns * 2) {
+		const values = [];
+		for (let i = 0; i < compact.length; i += 2) {
+			values.push(Number(compact.slice(i, i + 2)));
+		}
+		if (values.every((n) => Number.isInteger(n) && n >= 0 && n < maze_width)) {
+			return values;
+		}
+		return null;
+	}
+	if (compact.length === path_turns) {
+		return compact.split("").map(Number);
+	}
+	return null;
+}
+
+function sameSeed(a, b) {
+	return a.length === b.length && a.every((n, i) => n === b[i]);
+}
+
+function applySeedInput() {
+	const input = document.getElementById("seed");
+	const parsed = parseSeed(input.value);
+	if (!parsed) {
+		input.classList.add("is-invalid");
+		input.value = formatSeed(seed);
 		return;
 	}
-	savestate = savestate.split(' ').map(Number);
-	if (savestate.length != path_turns || Math.max(...savestate) >= maze_width || Math.min(...savestate) < 0) {
-		alert("Bad seed");
+	input.classList.remove("is-invalid");
+	if (sameSeed(parsed, seed)) {
+		input.value = formatSeed(seed);
 		return;
 	}
-	seed = savestate;
+	seed = parsed;
 	reset();
 }
 
@@ -512,22 +537,95 @@ function showSolution() {
 }
 
 function writePar() {
-	document.getElementById("par").innerHTML = `Best possible time: ${(optimal_tickpos.length * tick_length/1000).toFixed(1)} seconds (${optimal_tickpos.length} ticks)`;
+	document.getElementById("par").textContent =
+		`${(optimal_tickpos.length * tick_length/1000).toFixed(1)}s · ${optimal_tickpos.length} ticks`;
+}
+
+function setMeter(id, text, grade) {
+	const el = document.getElementById(id);
+	el.textContent = text;
+	el.className = grade ? `sote__meter sote__meter--${grade}` : "sote__meter";
 }
 
 function writeTime() {
-	let timerMsg = `${(ticks * tick_length/1000).toFixed(1)} seconds (${ticks} ticks, ${ticks_stalled} stalled)`;
-	if (moves.length > 0 && moves[0].y != maze_height - 1) {
-		timerMsg += " but you skipped the first tile";
-		if (team_damaged) {
-			timerMsg += " and you damaged your team";
+	const started = ticks > 0 || moves.length > 0;
+	const finished = player_position && player_position.y <= 0;
+	const caught = Boolean(
+		started &&
+		tornado_position &&
+		Number.isInteger(tornado_position.x) &&
+		Number.isInteger(player_position.x) &&
+		player_position.x == tornado_position.x &&
+		player_position.y == tornado_position.y
+	);
+	const done = finished || caught;
+	const skippedStart = moves.length > 0 && moves[0].y != maze_height - 1;
+	const failed = team_damaged || skippedStart || caught;
+	const over = ticks - optimal_tickpos.length;
+
+	let pace = "";
+	if (started && done) {
+		if (!failed && over <= 0) {
+			pace = "good";
+		} else if (!failed && over <= 2) {
+			pace = "ok";
+		} else {
+			pace = "bad";
 		}
-		timerMsg += "!";
-	} else if (team_damaged) {
-		timerMsg += " but you damaged your team!";
+	} else if (started && over > 0) {
+		pace = "bad";
 	}
 
-	document.getElementById("timer").innerHTML = timerMsg;
+	let stall = "";
+	if (started && done) {
+		if (ticks_stalled === 0 && !failed) {
+			stall = "good";
+		} else if (ticks_stalled <= 2 && !failed) {
+			stall = "ok";
+		} else if (ticks_stalled === 0) {
+			stall = "ok";
+		} else {
+			stall = "bad";
+		}
+	} else if (started) {
+		if (ticks_stalled >= 3) {
+			stall = "bad";
+		} else if (ticks_stalled >= 1) {
+			stall = "ok";
+		}
+	}
+
+	setMeter("timer-seconds", `${(ticks * tick_length/1000).toFixed(1)}s`, pace);
+	setMeter("timer-ticks", `${ticks} ticks`, pace);
+	setMeter("timer-stalled", `${ticks_stalled} stalled`, stall);
+
+	const note = document.getElementById("timer-note");
+	const parts = [];
+	if (skippedStart) {
+		parts.push("Skipped the first tile");
+	}
+	if (team_damaged) {
+		parts.push("Damaged your team");
+	}
+	if (caught) {
+		parts.push("Caught by the tornado");
+	}
+	if (parts.length) {
+		note.hidden = false;
+		note.textContent = parts.join(" · ") + "!";
+	} else {
+		note.hidden = true;
+		note.textContent = "";
+	}
+}
+
+function writeSeed() {
+	const input = document.getElementById("seed");
+	if (document.activeElement === input) {
+		return;
+	}
+	input.classList.remove("is-invalid");
+	input.value = formatSeed(seed);
 }
 
 function gameTick() {
@@ -608,6 +706,7 @@ function newSession() {
 	drawMaze(maze);
 	writePar();
 	writeTime();
+	writeSeed();
 }
 
 function reset() {
@@ -618,6 +717,28 @@ function reset() {
 	drawMaze(maze);
 	writePar();
 	writeTime();
+	writeSeed();
+}
+
+function bindUi() {
+	document.getElementById("btn-reset").addEventListener("click", reset);
+	document.getElementById("btn-new").addEventListener("click", newSession);
+	document.getElementById("btn-solution").addEventListener("click", showSolution);
+	document.getElementById("btn-instructions").addEventListener("click", showInstructions);
+	document.getElementById("btn-about").addEventListener("click", showAbout);
+	const seedInput = document.getElementById("seed");
+	seedInput.addEventListener("input", () => {
+		seedInput.classList.remove("is-invalid");
+		seedInput.value = seedInput.value.replace(/\D/g, "").slice(0, 16);
+	});
+	seedInput.addEventListener("blur", applySeedInput);
+	seedInput.addEventListener("keydown", (event) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			seedInput.blur();
+		}
+	});
+	window.addEventListener("resize", resize);
 }
 
 var tornado_position;
@@ -644,5 +765,6 @@ var path_taken;
 // var time_a;
 // var time_b;
 
+bindUi();
 newSession();
 resize();

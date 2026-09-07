@@ -56,10 +56,11 @@ export function formatGpCompact(value: number): string {
 
 export function formatQty(value: number): string {
   const abs = Math.abs(value);
-  if (abs >= 100) return Math.round(value).toLocaleString("en-GB");
-  if (abs >= 1) return value.toFixed(2);
-  if (abs >= 0.01) return value.toFixed(4);
-  return value.toPrecision(3);
+  if (abs >= 100) {
+    return value.toLocaleString("en-GB", { maximumFractionDigits: 3 });
+  }
+  if (abs >= 1) return value.toFixed(3);
+  return value.toLocaleString("en-GB", { maximumFractionDigits: 3 });
 }
 
 export function unitCostGp(line: Pick<IoLine, "qtyPerCompletion" | "gpPerCompletion">): number | null {

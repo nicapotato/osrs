@@ -134,7 +134,12 @@ export default function OsrsCharacterPage() {
   return (
     <div className="osrs-mmg osrs-character">
       <header className="osrs-mmg__header osrs-mmg__header--compact">
-        <h1>OSRS Character</h1>
+        <div className="osrs-mmg__header-row">
+          <h1>OSRS Character</h1>
+          <nav className="osrs-mmg__header-nav" aria-label="Page links">
+            <a href="/">Home</a>
+          </nav>
+        </div>
         <p>
           Load a player from{" "}
           <a href="https://wiseoldman.net" target="_blank" rel="noreferrer">
