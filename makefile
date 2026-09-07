@@ -1,6 +1,6 @@
 .PHONY: help install dev build preview serve kill-port import-osrs-db download-osrs-skill-icons
 
-PORT ?= 8882
+PORT ?= 8883
 MMG_APP := mmg-app
 OSRS_DATA_DIR := data/osrs-mmg
 OSRS_S3_PREFIX ?= s3://prod-public-mindtricks-data/prod/client/osrs-mmg
@@ -41,7 +41,7 @@ preview: ## Preview production MMG build
 kill-port:
 	lsof -t -i :${PORT} | xargs kill -9
 
-serve: ## Local HTTP server for repo root; open http://127.0.0.1:8882/
+serve: ## Local HTTP server for repo root; open http://127.0.0.1:8883/
 	@echo "Serving . on http://127.0.0.1:$(PORT)/"
 	@echo "  sotetseg: http://127.0.0.1:$(PORT)/sotetseg/"
 	@echo "  mmg:      http://127.0.0.1:$(PORT)/mmg/"

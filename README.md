@@ -29,9 +29,9 @@ After you change `mmg-app/`, run `make build` and commit `mmg/` plus root `404.h
 
 | Command | Description |
 |--------|-------------|
-| `make serve` | Serve repo root on `http://127.0.0.1:8882/` |
+| `make serve` | Serve repo root on `http://127.0.0.1:8883/` |
 | `PORT=3000 make serve` | Another port |
-| `make kill-port` | Free port 8882 |
+| `make kill-port` | Free port 8883 |
 | `make install` | Install MMG app dependencies (bun) |
 | `make dev` | Vite MMG app on `http://127.0.0.1:5174/` |
 | `make build` | Write `mmg/` + root `404.html` |
