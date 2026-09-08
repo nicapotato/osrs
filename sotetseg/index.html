@@ -10,7 +10,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 	<link rel="stylesheet" href="../landing.css" />
-	<link rel="stylesheet" href="style.css?v=7" />
+	<link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
 	<main class="home sote">
@@ -47,6 +47,8 @@
 					<span class="sote__meter" id="timer-ticks">0 ticks</span>
 					<span class="sote__stat-sep"> · </span>
 					<span class="sote__meter" id="timer-stalled">0 stalled</span>
+					<span class="sote__stat-sep" id="depth-sep" hidden> · </span>
+					<span class="sote__meter" id="timer-depth" hidden>maze 1</span>
 				</strong>
 			</div>
 			<div class="sote__stat">
@@ -105,7 +107,7 @@
 					<li>Click a path tile to start. The maze continues north without end.</li>
 					<li>Stay on the red path. Off-path tiles lower accuracy.</li>
 					<li>A stall paints the tile yellow.</li>
-					<li>Finish the visible maze. The next segment loads when you reach the last tile.</li>
+					<li>Finish the visible maze, then click the new path. The next segment loads when you reach the last tile.</li>
 				</ol>
 				<p>Pick a time limit like a typing test. The headline score is tiles per minute.</p>
 				<p>Movement matches Old School RuneScape and resolves every tick (600ms). There is no tornado.</p>
@@ -128,6 +130,6 @@
 		</form>
 	</dialog>
 
-	<script src="sotetseg.js?v=7"></script>
+	<script src="sotetseg.js?v=8"></script>
 </body>
 </html>

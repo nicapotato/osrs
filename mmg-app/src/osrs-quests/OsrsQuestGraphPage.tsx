@@ -7,6 +7,7 @@ import { OsrsMmgSkillIcons } from "../osrs-mmg/OsrsMmgSkillIcons";
 import type { SkillRequirement } from "../osrs-mmg/types";
 import type { CharacterProfile } from "../osrs-character/types";
 import { loadWomPlayer, refreshWomPlayer, WomApiError } from "../osrs-character/womClient";
+import { QuestGraphLegend } from "./QuestGraphLegend";
 import { QuestGraphSvg } from "./QuestGraphSvg";
 import { loadQuestGraph } from "./loadGraph";
 import { indexGraph, wikiUrl } from "./neighborhood";
@@ -290,13 +291,16 @@ export default function OsrsQuestGraphPage() {
         </aside>
 
         <div className="osrs-quest__main">
-          <div className="osrs-quest__canvas">
-            <QuestGraphSvg
-              graph={graph}
-              focusId={focus.id}
-              statusById={statusById}
-              onSelect={selectNode}
-            />
+          <div className="osrs-quest__canvas-stack">
+            <div className="osrs-quest__canvas">
+              <QuestGraphSvg
+                graph={graph}
+                focusId={focus.id}
+                statusById={statusById}
+                onSelect={selectNode}
+              />
+            </div>
+            <QuestGraphLegend />
           </div>
 
           <section className="osrs-quest__detail">

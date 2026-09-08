@@ -139,6 +139,8 @@ function applyModeUi() {
 	document.getElementById("instructions-tob").hidden = infinite;
 	document.getElementById("instructions-infinite").hidden = !infinite;
 	document.getElementById("stat-third-kicker").textContent = infinite ? "Time" : "Seed";
+	document.getElementById("depth-sep").hidden = !infinite;
+	document.getElementById("timer-depth").hidden = !infinite;
 	document.getElementById("seed").hidden = infinite;
 	const durationSelect = document.getElementById("duration-select");
 	const timeRemaining = document.getElementById("time-remaining");
@@ -187,11 +189,13 @@ function resize() {
 }
 
 function getTileClicked(event) {
-	let rect = canvas.getBoundingClientRect();
-	let pixel_x = event.clientX - rect.left;
-	let pixel_y = event.clientY - rect.top;
-	let tile_x = Math.floor(pixel_x / tile_size);
-	let tile_y = Math.floor(pixel_y / tile_size + cameraY);
+	const rect = canvas.getBoundingClientRect();
+	const pixel_x = event.clientX - rect.left;
+	const pixel_y = event.clientY - rect.top;
+	const tileW = rect.width / maze_width;
+	const tileH = rect.height / maze_height;
+	const tile_x = Math.floor(pixel_x / tileW);
+	const tile_y = Math.floor(pixel_y / tileH + cameraTargetY);
 	return { x: tile_x, y: tile_y };
 }
 
@@ -448,6 +452,7 @@ function maybeAdvanceMaze() {
 	}
 	loadNextSegment();
 	cameraTargetY -= SEGMENT_ROWS;
+	mazeDepth += 1;
 	startCameraAnim();
 }
 
@@ -695,7 +700,12 @@ function applySeedInput() {
 function getPassedTiles(previous, target) {
 	let current = new Point(previous.x, previous.y);
 	let result = new Array();
-	while (result.length < 2 && !(current.x == target.x && current.y == target.y)) {
+	let guard = 0;
+	while (result.length < 2 && !(current.x == target.x && current.y == target.y) && guard < 4) {
+		guard += 1;
+		if (!Number.isFinite(current.x) || !Number.isFinite(target.x)) {
+			break;
+		}
 		let movement_vector = new Point(target.x - current.x, target.y - current.y);
 		if (Math.abs(movement_vector.x) == Math.abs(movement_vector.y)) { // diagonal
 			current.x += (current.x < target.x ? 1 : -1);
@@ -749,6 +759,18 @@ function drawTornado() {
 	ctx.drawImage(imgTornado, tileScreenX(tornado_position.x)+tile_size*0.1, tileScreenY(tornado_position.y)+tile_size*0.1, tile_size*0.8, tile_size*0.8);
 }
 
+function drawTimeUp() {
+	ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.textAlign = "center";
+	ctx.lineWidth = solv_fontsize / 3;
+	ctx.font = `bold ${solv_fontsize * 1.6}px ${solv_font}`;
+	ctx.strokeStyle = "black";
+	ctx.fillStyle = "#ffff00";
+	ctx.strokeText("TIME", canvas.width / 2, canvas.height / 2);
+	ctx.fillText("TIME", canvas.width / 2, canvas.height / 2);
+}
+
 function drawState() {
 	if (!maze && !mazeWorld) {
 		return;
@@ -767,6 +789,9 @@ function drawState() {
 	}
 	if (!isInfinite() && player_position.y <= 0) {
 		drawEndGame();
+	}
+	if (isInfinite() && infiniteFinished && durationMs()) {
+		drawTimeUp();
 	}
 }
 
@@ -870,6 +895,7 @@ function writeInfiniteTime() {
 	setMeter("timer-seconds", `${stats.tilesPerMin.toFixed(1)} t/m`, "");
 	setMeter("timer-ticks", `${stats.accuracy.toFixed(0)}%`, accGrade);
 	setMeter("timer-stalled", `${stats.stallsPerMin.toFixed(1)} stall/m`, stall);
+	setMeter("timer-depth", `maze ${mazeDepth}`, "");
 
 	const limit = durationMs();
 	const elapsed = ticks * tick_length;
@@ -884,7 +910,7 @@ function writeInfiniteTime() {
 	const note = document.getElementById("timer-note");
 	const parts = [];
 	if (infiniteFinished && limit) {
-		parts.push("Time");
+		parts.push("Time up · Reset to play again");
 	}
 	if (team_damaged) {
 		parts.push("Damaged your team");
@@ -1073,6 +1099,7 @@ function resetvars() {
 	ticks = 0;
 	ticks_stalled = 0;
 	tiles_on_path = 0;
+	mazeDepth = 1;
 	stalled_tiles = new Array();
 	session_active = false;
 	infiniteFinished = false;
@@ -1187,6 +1214,7 @@ var path_coordinates;
 var ticks;
 var ticks_stalled;
 var tiles_on_path;
+var mazeDepth;
 var stalled_tiles;
 var timerTick;
 var session_active;

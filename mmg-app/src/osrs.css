@@ -1912,6 +1912,11 @@ html:has(.osrs-app) #root {
   min-width: 0;
 }
 
+.osrs-quest__canvas-stack {
+  display: grid;
+  gap: 0.45rem;
+}
+
 .osrs-quest__canvas {
   height: 28rem;
   overflow: hidden;
@@ -1943,9 +1948,152 @@ html:has(.osrs-app) #root {
 
 .osrs-quest__node-label {
   font-size: 11px;
+  font-weight: 600;
   fill: #1a1208;
   pointer-events: none;
 }
+
+.osrs-quest__node-sub {
+  font-size: 9px;
+  font-weight: 500;
+  fill: #5c4a32;
+}
+
+.osrs-quest__node-level {
+  fill: #2f4a1f;
+}
+
+.osrs-quest__node-level-text {
+  font-size: 11px;
+  font-weight: 700;
+  fill: #f4ead0;
+  pointer-events: none;
+}
+
+.osrs-quest__legend {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--osrs-border);
+  background: rgba(244, 234, 208, 0.7);
+}
+
+.osrs-quest__legend-title {
+  margin: 0 0 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5c4a32;
+}
+
+.osrs-quest__legend-groups {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem 0.75rem;
+}
+
+.osrs-quest__legend-heading {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #3d2f1c;
+}
+
+.osrs-quest__legend-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.osrs-quest__legend-group li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.12rem 0;
+  font-size: 0.72rem;
+  color: #3d2f1c;
+}
+
+.osrs-quest__legend-swatch,
+.osrs-quest__legend-ring {
+  flex: 0 0 auto;
+  width: 0.85rem;
+  height: 0.7rem;
+  border: 1px solid #5c4a32;
+}
+
+.osrs-quest__legend-swatch--quest {
+  background: #f4ead0;
+  border-radius: 3px;
+}
+
+.osrs-quest__legend-swatch--miniquest {
+  background: #efe0c0;
+  border-radius: 4px;
+}
+
+.osrs-quest__legend-swatch--diary {
+  background: #d7e3ef;
+  border-radius: 2px;
+}
+
+.osrs-quest__legend-swatch--skill {
+  background: #cfe4b8;
+  border-radius: 8px;
+}
+
+.osrs-quest__legend-swatch--other {
+  background: #e4d4f0;
+  border-radius: 6px;
+}
+
+.osrs-quest__legend-swatch--focus {
+  background: #f3e2a0;
+  border-width: 2px;
+  border-color: #7b4f17;
+  border-radius: 3px;
+}
+
+.osrs-quest__legend-stripe {
+  width: 0.35rem;
+  height: 0.85rem;
+  background: hsl(208 42% 38%);
+  border-radius: 1px;
+}
+
+.osrs-quest__legend-line {
+  width: 1.15rem;
+  height: 0;
+  border-top: 2px solid #8a7048;
+}
+
+.osrs-quest__legend-line--skill {
+  border-top-style: dashed;
+  border-top-color: #4f6b3a;
+}
+
+.osrs-quest__legend-ring {
+  border-radius: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  background: #f4ead0;
+}
+
+.osrs-quest__legend-ring--done {
+  border-color: #2f6b2f;
+  border-width: 2px;
+}
+
+.osrs-quest__legend-ring--ready {
+  border-color: #8a6a12;
+  border-width: 2px;
+}
+
+.osrs-quest__legend-ring--locked {
+  border-color: #8a3030;
+  border-width: 2px;
+}
+
 
 .osrs-quest__detail {
   margin-top: 0.85rem;
@@ -2005,5 +2153,9 @@ html:has(.osrs-app) #root {
 
   .osrs-quest__list {
     max-height: 12rem;
+  }
+
+  .osrs-quest__legend-groups {
+    grid-template-columns: 1fr 1fr;
   }
 }
