@@ -10,7 +10,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 	<link rel="stylesheet" href="../landing.css" />
-	<link rel="stylesheet" href="style.css?v=4" />
+	<link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
 	<main class="home sote">
@@ -22,7 +22,14 @@
 			</div>
 		</header>
 		<header class="home__header sote__header">
-			<h1 class="sote__title">Sotetseg maze</h1>
+			<label class="sote__mode">
+				<span class="sote__sr">Mode</span>
+				<span class="sote__title sote__mode-face" id="mode-face" aria-hidden="true">Theatre of Blood Maze</span>
+				<select class="sote__mode-select" id="mode-select">
+					<option value="tob">Theatre of Blood Maze</option>
+					<option value="infinite">Infinite Maze</option>
+				</select>
+			</label>
 		</header>
 		<div class="sote__maze" id="sote-maze-host">
 			<canvas id="sotetseg-maze" tabindex="0"></canvas>
@@ -43,7 +50,7 @@
 				</strong>
 			</div>
 			<div class="sote__stat">
-				<span class="sote__stat-kicker">Seed</span>
+				<span class="sote__stat-kicker" id="stat-third-kicker">Seed</span>
 				<input
 					class="sote__seed-input"
 					id="seed"
@@ -54,6 +61,21 @@
 					maxlength="16"
 					aria-label="Maze seed, eight values from 00 to 13"
 				/>
+				<select
+					class="sote__duration-select"
+					id="duration-select"
+					hidden
+					aria-label="Time limit"
+				>
+					<option value="10">10s</option>
+					<option value="30">30s</option>
+					<option value="60">1m</option>
+					<option value="150">2.5m</option>
+					<option value="300">5m</option>
+					<option value="600">10m</option>
+					<option value="inf">Infinite</option>
+				</select>
+				<strong class="sote__stat-value" id="time-remaining" hidden>0.0s</strong>
 			</div>
 		</section>
 		<p class="sote__note" id="timer-note" hidden></p>
@@ -67,15 +89,27 @@
 	<dialog class="sote-dialog" id="dialog-instructions">
 		<form method="dialog">
 			<h2>Instructions</h2>
-			<ol>
-				<li>Start on the first tile. Your character waits one tile south.</li>
-				<li>Finish on the last tile.</li>
-				<li>Do not damage teammates. Mistakes are marked red.</li>
-				<li>A stall paints the tile yellow.</li>
-			</ol>
-			<p>Movement matches Old School RuneScape and resolves every tick (600ms).</p>
-			<p>White circles are your position each tick. Blue numbers are your path. Orange numbers are one optimal path.</p>
-			<p>There can be more than one optimal path. Making par is enough.</p>
+			<div id="instructions-tob">
+				<ol>
+					<li>Start on the first tile. Your character waits one tile south.</li>
+					<li>Finish on the last tile.</li>
+					<li>Do not damage teammates. Mistakes are marked red.</li>
+					<li>A stall paints the tile yellow.</li>
+				</ol>
+				<p>Movement matches Old School RuneScape and resolves every tick (600ms).</p>
+				<p>White circles are your position each tick. Blue numbers are your path. Orange numbers are one optimal path.</p>
+				<p>There can be more than one optimal path. Making par is enough.</p>
+			</div>
+			<div id="instructions-infinite" hidden>
+				<ol>
+					<li>Click a path tile to start. The maze continues north without end.</li>
+					<li>Stay on the red path. Off-path tiles lower accuracy.</li>
+					<li>A stall paints the tile yellow.</li>
+					<li>Finish the visible maze. The next segment loads when you reach the last tile.</li>
+				</ol>
+				<p>Pick a time limit like a typing test. The headline score is tiles per minute.</p>
+				<p>Movement matches Old School RuneScape and resolves every tick (600ms). There is no tornado.</p>
+			</div>
 			<menu class="sote-dialog__menu">
 				<button type="submit" class="stone-btn stone-btn--compact" value="close">Close</button>
 			</menu>
@@ -94,6 +128,6 @@
 		</form>
 	</dialog>
 
-	<script src="sotetseg.js?v=4"></script>
+	<script src="sotetseg.js?v=7"></script>
 </body>
 </html>
