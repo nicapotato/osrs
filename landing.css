@@ -8,7 +8,7 @@
   --osrs-stone-dark: #0c0a08;
   --osrs-banner: #6b1515;
   --pixel: "Press Start 2P", ui-monospace, monospace;
-  --frame-width: 910px;
+  --frame-width: 100vw;
 }
 
 *,
@@ -20,25 +20,32 @@
 html,
 body {
   margin: 0;
+  height: 100%;
   min-height: 100%;
   background: #000;
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100dvh;
   color: var(--osrs-yellow);
   font-family: var(--pixel);
 }
 
 .home {
-  width: min(100%, var(--frame-width));
-  min-height: 100vh;
-  margin: 0 auto;
-  padding: 2.25rem 5.5rem 3.25rem;
+  width: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 2.25rem clamp(1.25rem, 6vw, 5.5rem) 3.25rem;
   background: #000 url("public/bg2.jpg") center top repeat-y;
   background-size: 100% auto;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+
+.home:not(.sote) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .home__header {
@@ -181,7 +188,7 @@ body {
 
 @media (max-width: 720px) {
   .home {
-    padding: 1.5rem 12vw 2.5rem;
+    padding: 1.5rem 8vw 2.5rem;
   }
 
   .cards {

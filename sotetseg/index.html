@@ -10,7 +10,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 	<link rel="stylesheet" href="../landing.css" />
-	<link rel="stylesheet" href="style.css?v=8" />
+	<link rel="stylesheet" href="style.css?v=11" />
 </head>
 <body>
 	<main class="home sote">
@@ -69,12 +69,10 @@
 					hidden
 					aria-label="Time limit"
 				>
-					<option value="10">10s</option>
-					<option value="30">30s</option>
-					<option value="60">1m</option>
-					<option value="150">2.5m</option>
-					<option value="300">5m</option>
-					<option value="600">10m</option>
+					<option value="10">10 sec</option>
+					<option value="30">30 sec</option>
+					<option value="60">1 min</option>
+					<option value="600">10 min</option>
 					<option value="inf">Infinite</option>
 				</select>
 				<strong class="sote__stat-value" id="time-remaining" hidden>0.0s</strong>
@@ -84,6 +82,8 @@
 		<nav class="sote__actions" aria-label="Maze controls">
 			<button type="button" class="stone-btn stone-btn--compact" id="btn-reset">Reset</button>
 			<button type="button" class="stone-btn stone-btn--compact" id="btn-new">New maze</button>
+			<button type="button" class="stone-btn stone-btn--compact" id="btn-end" hidden>End early</button>
+			<button type="button" class="stone-btn stone-btn--compact" id="btn-review" hidden>View route</button>
 			<button type="button" class="stone-btn stone-btn--compact" id="btn-solution">Solution</button>
 		</nav>
 	</main>
@@ -109,7 +109,7 @@
 					<li>A stall paints the tile yellow.</li>
 					<li>Finish the visible maze, then click the new path. The next segment loads when you reach the last tile.</li>
 				</ol>
-				<p>Pick a time limit like a typing test. The headline score is tiles per minute.</p>
+				<p>Pick a time limit. When time runs out, TIME appears. End early anytime, then Reset or View route to scroll your path against a tick-perfect line.</p>
 				<p>Movement matches Old School RuneScape and resolves every tick (600ms). There is no tornado.</p>
 			</div>
 			<menu class="sote-dialog__menu">
@@ -130,6 +130,6 @@
 		</form>
 	</dialog>
 
-	<script src="sotetseg.js?v=8"></script>
+	<script src="sotetseg.js?v=11"></script>
 </body>
 </html>

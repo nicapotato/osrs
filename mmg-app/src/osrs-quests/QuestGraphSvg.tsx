@@ -66,6 +66,10 @@ export function QuestGraphSvg({ graph, focusId, statusById, onSelect }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const layout = layoutNeighborhood(graph, focusId);
   const nodesById = new Map(layout.nodes.map((node) => [node.id, node]));
+  const viewWidth = Math.max(layout.width + 80, 1280);
+  const viewHeight = Math.max(layout.height + 80, 720);
+  const viewX = -((viewWidth - layout.width) / 2);
+  const viewY = -((viewHeight - layout.height) / 2);
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -102,7 +106,8 @@ export function QuestGraphSvg({ graph, focusId, statusById, onSelect }: Props) {
     <svg
       ref={svgRef}
       className="osrs-quest__svg"
-      viewBox={`0 0 ${layout.width} ${layout.height}`}
+      viewBox={`${viewX} ${viewY} ${viewWidth} ${viewHeight}`}
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Quest requirement neighborhood"
     >

@@ -1,6 +1,8 @@
-.PHONY: help install dev build preview serve kill-port import-osrs-db download-osrs-skill-icons build-quest-graph
+.PHONY: help install dev serve-vite build preview serve serve-pages serve-sote kill-port kill-pages kill-vite import-osrs-db download-osrs-skill-icons build-quest-graph
 
-PORT ?= 8883
+PAGES_PORT ?= 8883
+PORT ?= $(PAGES_PORT)
+VITE_PORT ?= 5174
 MMG_APP := mmg-app
 OSRS_DATA_DIR := data/osrs-mmg
 OSRS_S3_PREFIX ?= s3://prod-public-mindtricks-data/prod/client/osrs-mmg
@@ -10,27 +12,39 @@ OSRS_SKILL_NAMES := Agility Attack Construction Cooking Crafting Defence Farming
 
 help: ## Show targets
 	@echo "osrs — GitHub Pages (HTML landing + sotetseg; Vite app in mmg/)"
-	@echo "  make serve              serve repo root at http://127.0.0.1:$(PORT)/"
-	@echo "  PORT=3000 make serve    use another port"
-	@echo "  make kill-port          free port $(PORT)"
+	@echo "  make serve-pages        landing + sotetseg at http://127.0.0.1:$(PAGES_PORT)/"
+	@echo "  make serve-sote         same static server (prints sotetseg URL)"
+	@echo "  make serve-vite         Vite app at http://127.0.0.1:$(VITE_PORT)/ (mmg + quests)"
+	@echo "  make serve              alias for serve-pages"
+	@echo "  make dev                alias for serve-vite"
+	@echo "  PAGES_PORT=3000 make serve-pages"
+	@echo "  make kill-pages         free port $(PAGES_PORT)"
+	@echo "  make kill-vite          free port $(VITE_PORT)"
+	@echo "  make kill-port          free both local servers"
 	@echo "  make install            bun install in mmg-app/"
-	@echo "  make dev                Vite MMG app at http://127.0.0.1:5174/"
 	@echo "  make build              production SPA → mmg/ + quests/ (+ root 404.html)"
 	@echo "  make preview            preview production MMG build"
 	@echo "  make import-osrs-db     download DuckDB + manifest into data/osrs-mmg/"
 	@echo "  make download-osrs-skill-icons  fetch skill icons into mmg-app/public/"
 	@echo "  make build-quest-graph  fetch wiki Questreq + emit mmg-app/public/osrs-quests/graph.json"
 	@echo ""
-	@echo "  http://127.0.0.1:$(PORT)/                 landing"
-	@echo "  http://127.0.0.1:$(PORT)/sotetseg/        sotetseg maze trainer"
-	@echo "  http://127.0.0.1:$(PORT)/mmg/             money makers (after make build)"
-	@echo "  http://127.0.0.1:$(PORT)/quests/          quest graph (after make build)"
+	@echo "  http://127.0.0.1:$(PAGES_PORT)/                 landing"
+	@echo "  http://127.0.0.1:$(PAGES_PORT)/sotetseg/        sotetseg maze trainer"
+	@echo "  http://127.0.0.1:$(VITE_PORT)/mmg               money makers (Vite)"
+	@echo "  http://127.0.0.1:$(VITE_PORT)/quests            quest graph (Vite)"
+	@echo "  http://127.0.0.1:$(PAGES_PORT)/mmg/             money makers (after make build)"
+	@echo "  http://127.0.0.1:$(PAGES_PORT)/quests/          quest graph (after make build)"
 
 install: ## Install MMG app dependencies (bun)
 	cd $(MMG_APP) && bun install
 
-dev: ## Vite dev server for MMG (loads .env.dev)
-	cd $(MMG_APP) && bun run dev
+serve-vite: ## Vite app for /mmg and /quests (loads .env.dev)
+	@echo "Vite app on http://127.0.0.1:$(VITE_PORT)/"
+	@echo "  mmg:    http://127.0.0.1:$(VITE_PORT)/mmg"
+	@echo "  quests: http://127.0.0.1:$(VITE_PORT)/quests"
+	cd $(MMG_APP) && bun run dev -- --port $(VITE_PORT) --strictPort
+
+dev: serve-vite ## Alias for serve-vite
 
 build: ## Production SPA → mmg/ + quests/; loads .env.prod
 	cd $(MMG_APP) && bun run build
@@ -43,15 +57,30 @@ build: ## Production SPA → mmg/ + quests/; loads .env.prod
 preview: ## Preview production MMG build
 	cd $(MMG_APP) && bun run preview
 
-kill-port:
-	lsof -t -i :${PORT} | xargs kill -9
+define kill_listen
+	@pids=$$(lsof -t -i :$(1) 2>/dev/null); \
+	if [ -n "$$pids" ]; then kill -9 $$pids; echo "freed :$(1)"; else echo "nothing on :$(1)"; fi
+endef
 
-serve: ## Local HTTP server for repo root; open http://127.0.0.1:8883/
-	@echo "Serving . on http://127.0.0.1:$(PORT)/"
-	@echo "  sotetseg: http://127.0.0.1:$(PORT)/sotetseg/"
-	@echo "  mmg:      http://127.0.0.1:$(PORT)/mmg/"
-	@echo "  quests:   http://127.0.0.1:$(PORT)/quests/"
-	python3 -m http.server $(PORT) --bind 127.0.0.1
+kill-pages: ## Free the static HTML server port
+	$(call kill_listen,$(PAGES_PORT))
+
+kill-vite: ## Free the Vite app port
+	$(call kill_listen,$(VITE_PORT))
+
+kill-port: kill-pages kill-vite ## Free pages + Vite ports
+
+serve-pages: ## Landing + sotetseg (static HTML at repo root)
+	@echo "Static pages on http://127.0.0.1:$(PAGES_PORT)/"
+	@echo "  landing:  http://127.0.0.1:$(PAGES_PORT)/"
+	@echo "  sotetseg: http://127.0.0.1:$(PAGES_PORT)/sotetseg/"
+	@echo "  mmg:      http://127.0.0.1:$(PAGES_PORT)/mmg/     (after make build)"
+	@echo "  quests:   http://127.0.0.1:$(PAGES_PORT)/quests/  (after make build)"
+	python3 -m http.server $(PAGES_PORT) --bind 127.0.0.1
+
+serve-sote: serve-pages ## Alias for serve-pages (sotetseg lives at /sotetseg/)
+
+serve: serve-pages ## Alias for serve-pages
 
 import-osrs-db: ## Download OSRS DuckDB + manifest into gitignored data/osrs-mmg/
 	@mkdir -p $(OSRS_DATA_DIR)

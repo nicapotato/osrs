@@ -23,8 +23,6 @@ const DURATIONS = {
 	"10": 10000,
 	"30": 30000,
 	"60": 60000,
-	"150": 150000,
-	"300": 300000,
 	"600": 600000,
 	"inf": 0,
 };
@@ -72,6 +70,14 @@ function isInfinite() {
 	return playMode === "infinite";
 }
 
+function isReview() {
+	return isInfinite() && reviewMode;
+}
+
+function reviewRowCount() {
+	return Math.max(1, worldSouthY - worldNorthY + 1);
+}
+
 function durationMs() {
 	return DURATIONS[durationId] || 0;
 }
@@ -85,6 +91,9 @@ function tileScreenY(y) {
 }
 
 function isOnScreen(y) {
+	if (isReview()) {
+		return y >= worldNorthY && y <= worldSouthY;
+	}
 	return y >= cameraY - 1 && y <= cameraY + maze_height + 1;
 }
 
@@ -106,6 +115,9 @@ function readUrlState() {
 	playMode = q.get("mode") === "infinite" ? "infinite" : "tob";
 	const time = q.get("time");
 	durationId = Object.prototype.hasOwnProperty.call(DURATIONS, time) ? time : "30";
+	if (time === "150" || time === "300") {
+		durationId = "600";
+	}
 }
 
 function syncUrl() {
@@ -136,6 +148,8 @@ function applyModeUi() {
 		}
 	}
 	document.getElementById("btn-solution").hidden = infinite;
+	document.getElementById("btn-end").hidden = !(infinite && session_active && !infiniteFinished);
+	document.getElementById("btn-review").hidden = !(infinite && infiniteFinished && !reviewMode);
 	document.getElementById("instructions-tob").hidden = infinite;
 	document.getElementById("instructions-infinite").hidden = !infinite;
 	document.getElementById("stat-third-kicker").textContent = infinite ? "Time" : "Seed";
@@ -156,26 +170,43 @@ function applyModeUi() {
 	document.title = infinite ? "Infinite maze trainer" : "Sotetseg maze trainer";
 }
 
+function mazeHostInnerSize(mazeHost) {
+	const style = getComputedStyle(mazeHost);
+	const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+	const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+	return {
+		width: Math.max(0, mazeHost.clientWidth - padX),
+		height: Math.max(0, mazeHost.clientHeight - padY),
+	};
+}
+
 function resize() {
-	const page = document.querySelector(".sote");
 	const mazeHost = document.getElementById("sote-maze-host");
-	const actions = document.querySelector(".sote__actions");
-	const stats = document.querySelector(".sote__stats");
-	const pageStyle = page ? getComputedStyle(page) : null;
-	const padX = pageStyle
-		? parseFloat(pageStyle.paddingLeft) + parseFloat(pageStyle.paddingRight)
-		: 32;
-	const availableW = (page ? page.clientWidth : window.innerWidth) - padX - 24;
-	const mazeTop = mazeHost ? mazeHost.getBoundingClientRect().top : 180;
-	const actionsH = actions ? actions.getBoundingClientRect().height : 72;
-	const statsH = stats ? stats.getBoundingClientRect().height : 80;
-	const availableH = window.innerHeight - mazeTop - actionsH - statsH - 48;
-	const next = Math.floor(Math.min(
-		40,
-		availableW / maze_width,
-		Math.max(availableH, 280) / maze_height
-	));
-	tile_size = Math.max(22, next);
+	if (!mazeHost) {
+		throw new Error("sotetseg: missing maze host");
+	}
+	mazeHost.classList.toggle("sote__maze--review", isReview());
+	const inner = mazeHostInnerSize(mazeHost);
+	if (inner.width < 8 || inner.height < 8) {
+		return;
+	}
+
+	if (isReview()) {
+		tile_size = Math.max(8, Math.floor(inner.width / maze_width));
+		tile_stroke  = tile_size/25;
+		solv_fontsize  = 15*(tile_size/40);
+		offset_optimal = solv_fontsize/2;
+		offset_user    = -offset_optimal;
+		cameraY = worldNorthY;
+		cameraTargetY = worldNorthY;
+		canvas.width = tile_size * maze_width;
+		canvas.height = tile_size * reviewRowCount();
+		drawState();
+		return;
+	}
+
+	const next = Math.floor(Math.min(inner.width / maze_width, inner.height / maze_height));
+	tile_size = Math.max(8, next);
 
 	tile_stroke  = tile_size/25;
 	solv_fontsize  = 15*(tile_size/40);
@@ -266,8 +297,8 @@ function drawMazeTile(x, y, color_tile) {
 
 function drawMaze() {
 	if (isInfinite()) {
-		const yStart = Math.floor(cameraY) - 1;
-		const yEnd = Math.ceil(cameraY) + maze_height;
+		const yStart = isReview() ? worldNorthY : Math.floor(cameraY) - 1;
+		const yEnd = isReview() ? worldSouthY : Math.ceil(cameraY) + maze_height;
 		for (let x = 0; x < maze_width; x++) {
 			for (let y = yStart; y <= yEnd; y++) {
 				drawMazeTile(x, y, isPath(x, y) ? color_tilepath : color_tilenogo);
@@ -437,7 +468,6 @@ function startCameraAnim() {
 		}
 		cameraY = to;
 		cameraAnim = null;
-		pruneSouth();
 		drawState();
 	}
 	cameraAnim = requestAnimationFrame(step);
@@ -576,7 +606,7 @@ function solveMaze() {
 function drawScore() {
 	let buffer = tile_size * 0.5;
 	let text_x = 0 + buffer;
-	if (seed[path_turns - 1] < maze_width / 2) {
+	if (!isInfinite() && seed[path_turns - 1] < maze_width / 2) {
 		text_x = maze_width * tile_size - buffer;
 		ctx.textAlign = "end";
 	} else {
@@ -588,13 +618,16 @@ function drawScore() {
 		strYourPath += `+${stalled_tiles.length} stalled`
 	}
 	let strComputerPath = `Optimal path: ${optimal_tickpos.length}`;
+	const text_y = isInfinite()
+		? tileScreenY(start_pos.y) + solv_fontsize * 1.5
+		: solv_fontsize * 1.5;
 	ctx.strokeStyle = "black";
 	ctx.fillStyle = color_lineplay;
-	ctx.strokeText(strYourPath, text_x, solv_fontsize * 1.5);
-	ctx.fillText(strYourPath, text_x, solv_fontsize * 1.5);
+	ctx.strokeText(strYourPath, text_x, text_y);
+	ctx.fillText(strYourPath, text_x, text_y);
 	ctx.fillStyle = color_linesolv;
-	ctx.strokeText(strComputerPath, text_x, solv_fontsize * 3);
-	ctx.fillText(strComputerPath, text_x, solv_fontsize * 3);
+	ctx.strokeText(strComputerPath, text_x, text_y + solv_fontsize * 1.5);
+	ctx.fillText(strComputerPath, text_x, text_y + solv_fontsize * 1.5);
 }
 
 function drawEndGame() {
@@ -652,6 +685,123 @@ function getNextPathTile(c_pos, o_pos) {
 		return neighbors[i];
 	}
 	return null;
+}
+
+function getNextPathTileWorld(c_pos, o_pos) {
+	const neighbors = [
+		new Point(c_pos.x, c_pos.y + 1),
+		new Point(c_pos.x + 1, c_pos.y),
+		new Point(c_pos.x, c_pos.y - 1),
+		new Point(c_pos.x - 1, c_pos.y),
+	];
+	for (let i = 0; i < neighbors.length; i++) {
+		const n = neighbors[i];
+		if (n.x < 0 || n.x >= maze_width) {
+			continue;
+		}
+		if (n.y < worldNorthY || n.y > worldSouthY) {
+			continue;
+		}
+		if (!isPath(n.x, n.y)) {
+			continue;
+		}
+		if (o_pos.x == n.x && o_pos.y == n.y) {
+			continue;
+		}
+		return n;
+	}
+	return null;
+}
+
+function pathWeightingWorld() {
+	weighted_maze = Array.from({ length: maze_width }, () => ({}));
+	path_coordinates = new Array();
+	let t_pos = new Point(-1, -1);
+	let p_pos = new Point(-1, -1);
+	let c_pos = new Point(start_pos.x, start_pos.y);
+	let counter = 1;
+	let guard = 0;
+	const maxTiles = maze_width * (worldSouthY - worldNorthY + 4);
+	while (c_pos && guard < maxTiles) {
+		guard += 1;
+		path_coordinates.push(new Point(c_pos.x, c_pos.y));
+		weighted_maze[c_pos.x][c_pos.y] = counter;
+		counter += 1;
+		t_pos = new Point(p_pos.x, p_pos.y);
+		p_pos = new Point(c_pos.x, c_pos.y);
+		c_pos = getNextPathTileWorld(c_pos, t_pos);
+	}
+}
+
+function isValidMoveWorld(current_tile, target_tile) {
+	if (target_tile.x < 0 || target_tile.x > maze_width - 1) {
+		return false;
+	}
+	if (target_tile.y < worldNorthY || target_tile.y > worldSouthY) {
+		return false;
+	}
+	if (!isPath(target_tile.x, target_tile.y)) {
+		return false;
+	}
+	const move_passed_tiles = getPassedTiles(current_tile, target_tile);
+	for (let i = 0; i < move_passed_tiles.length; i++) {
+		if (!isPath(move_passed_tiles[i].x, move_passed_tiles[i].y)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+function solveMazeWorld(finishY) {
+	optimal_tickpos = new Array();
+	optimal_halftickpos = new Array();
+	optimal_tickpos.push(new Point(start_pos.x, start_pos.y));
+	let guard = 0;
+	const maxSteps = Math.max(8, (worldSouthY - finishY + 4) * 4);
+	while (optimal_tickpos[optimal_tickpos.length - 1].y > finishY && guard < maxSteps) {
+		guard += 1;
+		let c = new Point(optimal_tickpos[optimal_tickpos.length - 1].x, optimal_tickpos[optimal_tickpos.length - 1].y);
+		let possible_moves = [
+			new Point(c.x - 2, c.y - 2),
+			new Point(c.x - 1, c.y - 2),
+			new Point(c.x, c.y - 2),
+			new Point(c.x + 1, c.y - 2),
+			new Point(c.x + 2, c.y - 2),
+			new Point(c.x - 2, c.y - 1),
+			new Point(c.x - 1, c.y - 1),
+			new Point(c.x, c.y - 1),
+			new Point(c.x + 1, c.y - 1),
+			new Point(c.x + 2, c.y - 1),
+			new Point(c.x - 2, c.y),
+			new Point(c.x - 1, c.y),
+			new Point(c.x + 1, c.y),
+			new Point(c.x + 2, c.y)
+		];
+		for (let i = 0; i < possible_moves.length; i++) {
+			if (!isValidMoveWorld(c, possible_moves[i])) {
+				possible_moves.splice(i, 1);
+				i--;
+			}
+		}
+		let best_move = new Point(-1, -1);
+		let best_move_score = -1;
+		for (let i = 0; i < possible_moves.length; i++) {
+			const score = weighted_maze[possible_moves[i].x][possible_moves[i].y] || -1;
+			if (score > best_move_score) {
+				best_move = new Point(possible_moves[i].x, possible_moves[i].y);
+				best_move_score = score;
+			}
+		}
+		if (best_move.x < 0) {
+			break;
+		}
+		optimal_tickpos.push(new Point(best_move.x, best_move.y));
+		let move_halftick = getPassedTiles(optimal_tickpos[optimal_tickpos.length - 2], optimal_tickpos[optimal_tickpos.length - 1]);
+		for (let i = 0; i < move_halftick.length; i++) {
+			optimal_halftickpos.push(move_halftick[i]);
+		}
+		optimal_halftickpos.unshift(start_pos);
+	}
 }
 
 function formatSeed(values) {
@@ -760,15 +910,38 @@ function drawTornado() {
 }
 
 function drawTimeUp() {
-	ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+	ctx.fillStyle = "rgba(0, 0, 0, 0.62)";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	ctx.textAlign = "center";
-	ctx.lineWidth = solv_fontsize / 3;
-	ctx.font = `bold ${solv_fontsize * 1.6}px ${solv_font}`;
+	ctx.lineWidth = Math.max(2, solv_fontsize / 2);
+	ctx.font = `bold ${Math.max(28, solv_fontsize * 2.4)}px ${solv_font}`;
 	ctx.strokeStyle = "black";
 	ctx.fillStyle = "#ffff00";
-	ctx.strokeText("TIME", canvas.width / 2, canvas.height / 2);
-	ctx.fillText("TIME", canvas.width / 2, canvas.height / 2);
+	const label = infiniteEndedEarly ? "ENDED" : "TIME";
+	ctx.strokeText(label, canvas.width / 2, canvas.height / 2);
+	ctx.fillText(label, canvas.width / 2, canvas.height / 2);
+	ctx.font = `bold ${Math.max(12, solv_fontsize)}px ${solv_font}`;
+	ctx.fillStyle = "#fff6a8";
+	ctx.strokeText("Reset or View route", canvas.width / 2, canvas.height / 2 + solv_fontsize * 2.4);
+	ctx.fillText("Reset or View route", canvas.width / 2, canvas.height / 2 + solv_fontsize * 2.4);
+}
+
+function drawRunClock() {
+	if (!isInfinite() || reviewMode || infiniteFinished) {
+		return;
+	}
+	const limit = durationMs();
+	const elapsed = ticks * tick_length;
+	const label = limit
+		? `${(Math.max(0, limit - elapsed) / 1000).toFixed(1)}s`
+		: `${(elapsed / 1000).toFixed(1)}s`;
+	ctx.textAlign = "center";
+	ctx.lineWidth = Math.max(2, solv_fontsize / 3);
+	ctx.font = `bold ${Math.max(16, solv_fontsize * 1.35)}px ${solv_font}`;
+	ctx.strokeStyle = "black";
+	ctx.fillStyle = limit && (limit - elapsed) <= 5000 ? "#ff4a3c" : "#ffff00";
+	ctx.strokeText(label, canvas.width / 2, solv_fontsize * 1.6);
+	ctx.fillText(label, canvas.width / 2, solv_fontsize * 1.6);
 }
 
 function drawState() {
@@ -781,7 +954,7 @@ function drawState() {
 	drawMoves();
 	const atTarget = player_position.x == targeted_tile.x && player_position.y == targeted_tile.y;
 	const tobDone = !isInfinite() && player_position.y <= 0;
-	if (!atTarget && !tobDone && Number.isInteger(targeted_tile.x)) {
+	if (!atTarget && !tobDone && !isReview() && Number.isInteger(targeted_tile.x)) {
 		drawTargetTile();
 	}
 	if (!isInfinite()) {
@@ -790,7 +963,14 @@ function drawState() {
 	if (!isInfinite() && player_position.y <= 0) {
 		drawEndGame();
 	}
-	if (isInfinite() && infiniteFinished && durationMs()) {
+	if (isReview()) {
+		drawEndGame();
+		return;
+	}
+	if (isInfinite() && session_active && !infiniteFinished) {
+		drawRunClock();
+	}
+	if (isInfinite() && infiniteFinished) {
 		drawTimeUp();
 	}
 }
@@ -902,15 +1082,22 @@ function writeInfiniteTime() {
 	const remainingEl = document.getElementById("time-remaining");
 	if (limit) {
 		const left = Math.max(0, limit - elapsed);
-		remainingEl.textContent = `${(left / 1000).toFixed(1)}s`;
+		if (infiniteFinished) {
+			remainingEl.textContent = infiniteEndedEarly ? "ENDED" : "TIME";
+		} else {
+			remainingEl.textContent = `${(left / 1000).toFixed(1)}s`;
+		}
+	} else if (infiniteFinished && infiniteEndedEarly) {
+		remainingEl.textContent = "ENDED";
 	} else {
 		remainingEl.textContent = `${(elapsed / 1000).toFixed(1)}s`;
 	}
+	remainingEl.classList.toggle("sote__time-bang", Boolean(infiniteFinished));
 
 	const note = document.getElementById("timer-note");
 	const parts = [];
-	if (infiniteFinished && limit) {
-		parts.push("Time up · Reset to play again");
+	if (infiniteFinished && !reviewMode) {
+		parts.push(infiniteEndedEarly ? "Ended early · Reset or View route" : "TIME · Reset or View route");
 	}
 	if (team_damaged) {
 		parts.push("Damaged your team");
@@ -1012,15 +1199,41 @@ function writeSeed() {
 	input.value = formatSeed(seed);
 }
 
-function endInfiniteRun() {
+function endInfiniteRun(endedEarly) {
 	session_active = false;
 	infiniteFinished = true;
+	infiniteEndedEarly = Boolean(endedEarly);
 	clearInterval(timerTick);
+	if (cameraAnim) {
+		cancelAnimationFrame(cameraAnim);
+		cameraAnim = null;
+		cameraY = cameraTargetY;
+	}
 	saveBestIfBetter();
 	writePar();
 	applyModeUi();
 	writeTime();
 	drawState();
+}
+
+function enterReview() {
+	if (!isInfinite() || !infiniteFinished) {
+		return;
+	}
+	reviewMode = true;
+	if (cameraAnim) {
+		cancelAnimationFrame(cameraAnim);
+		cameraAnim = null;
+	}
+	pathWeightingWorld();
+	const finishY = Number.isInteger(player_position.y) ? player_position.y : worldNorthY;
+	solveMazeWorld(finishY);
+	applyModeUi();
+	resize();
+	const host = document.getElementById("sote-maze-host");
+	requestAnimationFrame(() => {
+		host.scrollTop = host.scrollHeight;
+	});
 }
 
 function gameTick() {
@@ -1103,6 +1316,12 @@ function resetvars() {
 	stalled_tiles = new Array();
 	session_active = false;
 	infiniteFinished = false;
+	infiniteEndedEarly = false;
+	reviewMode = false;
+	const mazeHost = document.getElementById("sote-maze-host");
+	if (mazeHost) {
+		mazeHost.classList.remove("sote__maze--review");
+	}
 	clearInterval(timerTick);
 	if (cameraAnim) {
 		cancelAnimationFrame(cameraAnim);
@@ -1125,7 +1344,7 @@ function newSession() {
 		applyModeUi();
 		writePar();
 		writeTime();
-		drawState();
+		resize();
 		return;
 	}
 	mazeWorld = null;
@@ -1146,7 +1365,7 @@ function reset() {
 		applyModeUi();
 		writePar();
 		writeTime();
-		drawState();
+		resize();
 		return;
 	}
 	mazeWorld = null;
@@ -1181,6 +1400,8 @@ function setDuration(next) {
 function bindUi() {
 	document.getElementById("btn-reset").addEventListener("click", reset);
 	document.getElementById("btn-new").addEventListener("click", newSession);
+	document.getElementById("btn-end").addEventListener("click", () => endInfiniteRun(true));
+	document.getElementById("btn-review").addEventListener("click", enterReview);
 	document.getElementById("btn-solution").addEventListener("click", showSolution);
 	document.getElementById("btn-instructions").addEventListener("click", showInstructions);
 	document.getElementById("btn-about").addEventListener("click", showAbout);
@@ -1219,6 +1440,8 @@ var stalled_tiles;
 var timerTick;
 var session_active;
 var infiniteFinished;
+var infiniteEndedEarly;
+var reviewMode;
 var seed;
 var maze;
 var mazeWorld;
@@ -1245,3 +1468,4 @@ readUrlState();
 bindUi();
 newSession();
 resize();
+requestAnimationFrame(resize);

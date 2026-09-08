@@ -9,6 +9,7 @@ import type { CharacterProfile } from "../osrs-character/types";
 import { loadWomPlayer, refreshWomPlayer, WomApiError } from "../osrs-character/womClient";
 import { QuestGraphLegend } from "./QuestGraphLegend";
 import { QuestGraphSvg } from "./QuestGraphSvg";
+import { QuestPicker } from "./QuestPicker";
 import { loadQuestGraph } from "./loadGraph";
 import { indexGraph, wikiUrl } from "./neighborhood";
 import { playerContextFromProfile, skillRequirementMet, statusForNode } from "./playerState";
@@ -131,7 +132,7 @@ export default function OsrsQuestGraphPage() {
 
   if (error) {
     return (
-      <div className="osrs-mmg osrs-quest">
+      <div className="osrs-mmg osrs-mmg--fill osrs-quest">
         <header className="osrs-mmg__header osrs-mmg__header--compact">
           <h1>Quest graph</h1>
         </header>
@@ -142,7 +143,7 @@ export default function OsrsQuestGraphPage() {
 
   if (!graph || !indexed) {
     return (
-      <div className="osrs-mmg osrs-quest">
+      <div className="osrs-mmg osrs-mmg--fill osrs-quest">
         <p>Loading quest graph…</p>
       </div>
     );
@@ -150,7 +151,7 @@ export default function OsrsQuestGraphPage() {
 
   if (!focus) {
     return (
-      <div className="osrs-mmg osrs-quest">
+      <div className="osrs-mmg osrs-mmg--fill osrs-quest">
         <header className="osrs-mmg__header osrs-mmg__header--compact">
           <h1>Quest graph</h1>
         </header>
@@ -167,170 +168,138 @@ export default function OsrsQuestGraphPage() {
 
   return (
     <div className="osrs-mmg osrs-quest">
-      <header className="osrs-mmg__header osrs-mmg__header--compact">
-        <div className="osrs-mmg__header-row">
-          <h1>Quest graph</h1>
-          <nav className="osrs-mmg__header-nav" aria-label="Page links">
-            <a href="/">Home</a>
-            <Link to="/mmg">Money makers</Link>
-            <Link to="/mmg/c">Character</Link>
-          </nav>
-        </div>
-        <p>
-          Requirement neighborhood from{" "}
-          <a href="https://oldschool.runescape.wiki/w/Module:Questreq/data" target="_blank" rel="noreferrer">
-            OSRS Wiki Questreq
-          </a>
-          . Skills via Wise Old Man. Quest ticks stay on this device.
-        </p>
-      </header>
-
-      <div className="osrs-quest__toolbar">
-        <label className="osrs-mmg__field osrs-quest__field">
-          Search
-          <input
-            className="osrs-mmg__search-input"
-            value={filters.query}
-            onChange={(event) => setFilters((prev) => ({ ...prev, query: event.target.value }))}
-            placeholder="Quest or series"
-          />
-        </label>
-        <label className="osrs-mmg__field osrs-quest__field">
-          Members
-          <select
-            value={filters.members}
-            onChange={(event) =>
-              setFilters((prev) => ({ ...prev, members: event.target.value as MembersFilter }))
-            }
-          >
-            <option value="all">All</option>
-            <option value="members">Members</option>
-            <option value="f2p">Free-to-play</option>
-          </select>
-        </label>
-        <label className="osrs-mmg__field osrs-quest__field">
-          Series
-          <select
-            value={filters.series}
-            onChange={(event) => setFilters((prev) => ({ ...prev, series: event.target.value }))}
-          >
-            <option value="">All storylines</option>
-            {seriesOptions.map((series) => (
-              <option key={series} value={series}>
-                {series}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="osrs-mmg__field osrs-quest__field">
-          Difficulty
-          <select
-            value={filters.difficulty}
-            onChange={(event) => setFilters((prev) => ({ ...prev, difficulty: event.target.value }))}
-          >
-            <option value="">All</option>
-            {difficultyOptions.map((difficulty) => (
-              <option key={difficulty} value={difficulty}>
-                {difficulty}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="osrs-mmg__field osrs-quest__field osrs-quest__field--grow">
-          Wise Old Man
-          <span className="osrs-quest__wom">
-            <input
-              className="osrs-mmg__search-input"
-              maxLength={12}
-              value={usernameInput}
-              disabled={womLoading}
-              onChange={(event) => setUsernameInput(event.target.value)}
-              placeholder="RuneScape name"
-            />
-            <button
-              type="button"
-              className="osrs-mmg__btn"
-              disabled={womLoading || !usernameInput.trim()}
-              onClick={() => void runWom("load")}
-            >
-              {womLoading ? "…" : "Lookup"}
-            </button>
-            <button
-              type="button"
-              className="osrs-mmg__btn osrs-mmg__btn--ghost"
-              disabled={womLoading || !usernameInput.trim()}
-              onClick={() => void runWom("refresh")}
-            >
-              Refresh
-            </button>
-          </span>
-        </label>
-      </div>
-
-      <div className="osrs-quest__layout">
-        <aside className="osrs-quest__list" aria-label="Quests">
-          <p className="osrs-mmg__search-count">{listNodes.length} shown</p>
-          <ul>
-            {listNodes.map((node) => (
-              <li key={node.id}>
-                <button
-                  type="button"
-                  className={
-                    node.id === focus.id
-                      ? "osrs-quest__list-btn osrs-quest__list-btn--active"
-                      : "osrs-quest__list-btn"
-                  }
-                  onClick={() => selectNode(node.id)}
-                >
-                  <span className={`osrs-quest__dot osrs-quest__dot--${statusById[node.id] ?? "unknown"}`} />
-                  <span>{node.label}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </aside>
-
-        <div className="osrs-quest__main">
-          <div className="osrs-quest__canvas-stack">
-            <div className="osrs-quest__canvas">
-              <QuestGraphSvg
-                graph={graph}
-                focusId={focus.id}
-                statusById={statusById}
-                onSelect={selectNode}
-              />
-            </div>
-            <QuestGraphLegend />
+      <div className="osrs-quest__stage">
+        <header className="osrs-mmg__header osrs-mmg__header--compact">
+          <div className="osrs-mmg__header-row">
+            <h1>Quest graph</h1>
+            <nav className="osrs-mmg__header-nav" aria-label="Page links">
+              <a href="/">Home</a>
+              <Link to="/mmg">Money makers</Link>
+              <Link to="/mmg/c">Character</Link>
+            </nav>
           </div>
+        </header>
 
-          <section className="osrs-quest__detail">
-            <div className="osrs-mmg__header-row">
-              <h2>{focus.label}</h2>
-              {isCompletableNode(focus) ? (
-                <button type="button" className="osrs-mmg__btn" onClick={onToggleDone}>
-                  {completed.has(focus.id) ? "Mark not done" : "Mark done"}
-                </button>
-              ) : null}
-            </div>
-            <p className="osrs-quest__meta">
-              {[focus.category, focus.difficulty, focus.length, focus.members === false ? "F2P" : focus.members ? "Members" : null, focus.series]
-                .filter(Boolean)
-                .join(" · ")}
-              {focus.series_index ? ` #${focus.series_index}` : ""}
-            </p>
-            <p>
-              <a href={wikiUrl(focus)} target="_blank" rel="noreferrer">
-                Open on OSRS Wiki
-              </a>
-            </p>
-            <OsrsMmgSkillIcons skills={focusSkills} />
-            <RequirementLists incoming={incoming} outgoing={outgoing} nodesById={indexed.nodesById} playerCtx={playerCtx} onSelect={selectNode} />
-            <p className="osrs-quest__credit">
-              Wiki data {wikiCreditDate(graph.source.fetched_at)}. {graph.source.license}.
-            </p>
-          </section>
+        <div className="osrs-quest__toolbar">
+          <label className="osrs-mmg__field osrs-quest__field osrs-quest__field--quest">
+            Quest
+            <QuestPicker nodes={listNodes} focus={focus} statusById={statusById} onSelect={selectNode} />
+          </label>
+          <label className="osrs-mmg__field osrs-quest__field">
+            Members
+            <select
+              value={filters.members}
+              onChange={(event) =>
+                setFilters((prev) => ({ ...prev, members: event.target.value as MembersFilter }))
+              }
+            >
+              <option value="all">All</option>
+              <option value="members">Members</option>
+              <option value="f2p">Free-to-play</option>
+            </select>
+          </label>
+          <label className="osrs-mmg__field osrs-quest__field">
+            Series
+            <select
+              value={filters.series}
+              onChange={(event) => setFilters((prev) => ({ ...prev, series: event.target.value }))}
+            >
+              <option value="">All storylines</option>
+              {seriesOptions.map((series) => (
+                <option key={series} value={series}>
+                  {series}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="osrs-mmg__field osrs-quest__field">
+            Difficulty
+            <select
+              value={filters.difficulty}
+              onChange={(event) => setFilters((prev) => ({ ...prev, difficulty: event.target.value }))}
+            >
+              <option value="">All</option>
+              {difficultyOptions.map((difficulty) => (
+                <option key={difficulty} value={difficulty}>
+                  {difficulty}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="osrs-mmg__field osrs-quest__field osrs-quest__field--grow">
+            Wise Old Man
+            <span className="osrs-quest__wom">
+              <input
+                className="osrs-mmg__search-input"
+                maxLength={12}
+                value={usernameInput}
+                disabled={womLoading}
+                onChange={(event) => setUsernameInput(event.target.value)}
+                placeholder="RuneScape name"
+              />
+              <button
+                type="button"
+                className="osrs-mmg__btn"
+                disabled={womLoading || !usernameInput.trim()}
+                onClick={() => void runWom("load")}
+              >
+                {womLoading ? "…" : "Lookup"}
+              </button>
+              <button
+                type="button"
+                className="osrs-mmg__btn osrs-mmg__btn--ghost"
+                disabled={womLoading || !usernameInput.trim()}
+                onClick={() => void runWom("refresh")}
+              >
+                Refresh
+              </button>
+            </span>
+          </label>
+        </div>
+
+        <div className="osrs-quest__canvas">
+          <QuestGraphSvg
+            graph={graph}
+            focusId={focus.id}
+            statusById={statusById}
+            onSelect={selectNode}
+          />
         </div>
       </div>
+
+      <QuestGraphLegend />
+
+      <section className="osrs-quest__detail">
+          <div className="osrs-mmg__header-row">
+            <h2>{focus.label}</h2>
+            {isCompletableNode(focus) ? (
+              <button type="button" className="osrs-mmg__btn" onClick={onToggleDone}>
+                {completed.has(focus.id) ? "Mark not done" : "Mark done"}
+              </button>
+            ) : null}
+          </div>
+          <p className="osrs-quest__meta">
+            {[focus.category, focus.difficulty, focus.length, focus.members === false ? "F2P" : focus.members ? "Members" : null, focus.series]
+              .filter(Boolean)
+              .join(" · ")}
+            {focus.series_index ? ` #${focus.series_index}` : ""}
+          </p>
+          <p>
+            <a href={wikiUrl(focus)} target="_blank" rel="noreferrer">
+              Open on OSRS Wiki
+            </a>
+          </p>
+          <OsrsMmgSkillIcons skills={focusSkills} />
+          <RequirementLists incoming={incoming} outgoing={outgoing} nodesById={indexed.nodesById} playerCtx={playerCtx} onSelect={selectNode} />
+          <p className="osrs-quest__credit">
+            Wiki data {wikiCreditDate(graph.source.fetched_at)}. {graph.source.license}.
+            Requirement neighborhood from{" "}
+            <a href="https://oldschool.runescape.wiki/w/Module:Questreq/data" target="_blank" rel="noreferrer">
+              OSRS Wiki Questreq
+            </a>
+            . Skills via Wise Old Man. Quest ticks stay on this device.
+          </p>
+        </section>
     </div>
   );
 }
