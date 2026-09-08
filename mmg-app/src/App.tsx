@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 const OsrsMmgRankingsPage = lazy(() => import("./osrs-mmg/OsrsMmgRankingsPage"));
 const OsrsMmgCalculatorPage = lazy(() => import("./osrs-mmg/OsrsMmgCalculatorPage"));
 const OsrsCharacterPage = lazy(() => import("./osrs-character/OsrsCharacterPage"));
+const OsrsQuestGraphPage = lazy(() => import("./osrs-quests/OsrsQuestGraphPage"));
 
 function PageFallback() {
   return <div className="osrs-mmg"><p>Loading…</p></div>;
@@ -20,6 +21,8 @@ export function App() {
               <Route path="/" element={<OsrsMmgRankingsPage />} />
               <Route path="/m/:methodId" element={<OsrsMmgCalculatorPage />} />
               <Route path="/c" element={<OsrsCharacterPage />} />
+              <Route path="/q" element={<OsrsQuestGraphPage />} />
+              <Route path="/q/:nodeId" element={<OsrsQuestGraphPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

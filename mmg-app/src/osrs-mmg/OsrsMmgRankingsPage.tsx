@@ -367,6 +367,7 @@ export default function OsrsMmgRankingsPage() {
           <h1>OSRS Money Maker Rankings</h1>
           <nav className="osrs-mmg__header-nav" aria-label="Page links">
             <a href="/">Home</a>
+            <Link to="/q">Quests</Link>
           </nav>
         </div>
         <p>Adjust kph, toggle methods, then Save. Click a method for the calculator.</p>

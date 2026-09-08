@@ -1,4 +1,4 @@
-.PHONY: help install dev build preview serve kill-port import-osrs-db download-osrs-skill-icons
+.PHONY: help install dev build preview serve kill-port import-osrs-db download-osrs-skill-icons build-quest-graph
 
 PORT ?= 8883
 MMG_APP := mmg-app
@@ -19,6 +19,7 @@ help: ## Show targets
 	@echo "  make preview            preview production MMG build"
 	@echo "  make import-osrs-db     download DuckDB + manifest into data/osrs-mmg/"
 	@echo "  make download-osrs-skill-icons  fetch skill icons into mmg-app/public/"
+	@echo "  make build-quest-graph  fetch wiki Questreq + emit mmg-app/public/osrs-quests/graph.json"
 	@echo ""
 	@echo "  http://127.0.0.1:$(PORT)/                 landing"
 	@echo "  http://127.0.0.1:$(PORT)/sotetseg/        sotetseg maze trainer"
@@ -45,12 +46,16 @@ serve: ## Local HTTP server for repo root; open http://127.0.0.1:8883/
 	@echo "Serving . on http://127.0.0.1:$(PORT)/"
 	@echo "  sotetseg: http://127.0.0.1:$(PORT)/sotetseg/"
 	@echo "  mmg:      http://127.0.0.1:$(PORT)/mmg/"
+	@echo "  quests:   http://127.0.0.1:$(PORT)/mmg/q"
 	python3 -m http.server $(PORT) --bind 127.0.0.1
 
 import-osrs-db: ## Download OSRS DuckDB + manifest into gitignored data/osrs-mmg/
 	@mkdir -p $(OSRS_DATA_DIR)
 	aws s3 cp $(OSRS_S3_PREFIX)/osrs-mmg.duckdb $(OSRS_DATA_DIR)/
 	aws s3 cp $(OSRS_S3_PREFIX)/manifest.json $(OSRS_DATA_DIR)/
+
+build-quest-graph: ## Fetch OSRS Wiki Questreq + Quests/List and write graph.json
+	python3 scripts/build_quest_graph.py
 
 download-osrs-skill-icons: ## Fetch 25x25 skill icons into mmg-app/public/osrs-assets/
 	@mkdir -p $(OSRS_ASSETS_DIR)

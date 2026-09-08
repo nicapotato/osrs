@@ -1821,3 +1821,189 @@ html:has(.osrs-app) #root {
     min-width: 12rem;
   }
 }
+
+.osrs-quest__error {
+  color: #8a3030;
+}
+
+.osrs-quest__toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.55rem 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.osrs-quest__field {
+  margin-bottom: 0;
+}
+
+.osrs-quest__field--grow {
+  grid-column: span 2;
+}
+
+.osrs-quest__wom {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.osrs-quest__layout {
+  display: grid;
+  grid-template-columns: minmax(11rem, 16rem) minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.osrs-quest__list {
+  max-height: 38rem;
+  overflow: auto;
+  padding: 0.35rem;
+  border: 1px solid var(--osrs-border);
+  background: var(--osrs-surface);
+}
+
+.osrs-quest__list ul {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+}
+
+.osrs-quest__list-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin: 0 0 0.15rem;
+  padding: 0.28rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--osrs-text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.osrs-quest__list-btn:hover,
+.osrs-quest__list-btn--active {
+  background: var(--osrs-btn-active-bg);
+}
+
+.osrs-quest__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #8a7048;
+}
+
+.osrs-quest__dot--done {
+  background: #2f6b2f;
+}
+
+.osrs-quest__dot--ready {
+  background: #c4a017;
+}
+
+.osrs-quest__dot--locked {
+  background: #8a3030;
+}
+
+.osrs-quest__main {
+  min-width: 0;
+}
+
+.osrs-quest__canvas {
+  height: 28rem;
+  overflow: hidden;
+  border: 1px solid var(--osrs-border);
+  background: rgba(244, 234, 208, 0.35);
+}
+
+.osrs-quest__svg {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.osrs-quest__edge {
+  fill: none;
+  stroke: #8a7048;
+  stroke-width: 1.4;
+  opacity: 0.7;
+}
+
+.osrs-quest__edge--skill {
+  stroke-dasharray: 4 3;
+  stroke: #4f6b3a;
+}
+
+.osrs-quest__node {
+  cursor: pointer;
+}
+
+.osrs-quest__node-label {
+  font-size: 11px;
+  fill: #1a1208;
+  pointer-events: none;
+}
+
+.osrs-quest__detail {
+  margin-top: 0.85rem;
+}
+
+.osrs-quest__detail h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.osrs-quest__detail h3 {
+  margin: 0.65rem 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.osrs-quest__meta,
+.osrs-quest__credit {
+  color: var(--osrs-text-muted);
+  font-size: 0.88rem;
+}
+
+.osrs-quest__req-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.osrs-quest__req-grid ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.osrs-quest__inline-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--osrs-link);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.osrs-quest__req-grid li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+@media (max-width: 800px) {
+  .osrs-quest__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .osrs-quest__field--grow {
+    grid-column: auto;
+  }
+
+  .osrs-quest__list {
+    max-height: 12rem;
+  }
+}
