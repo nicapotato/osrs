@@ -143,7 +143,7 @@ export function OsrsMmgRankingsFilter({
               >
                 Refresh
               </button>
-              <Link className="osrs-mmg__filter-link" to="/c">
+              <Link className="osrs-mmg__filter-link" to="/mmg/c">
                 Character page
               </Link>
             </div>

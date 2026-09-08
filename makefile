@@ -15,7 +15,7 @@ help: ## Show targets
 	@echo "  make kill-port          free port $(PORT)"
 	@echo "  make install            bun install in mmg-app/"
 	@echo "  make dev                Vite MMG app at http://127.0.0.1:5174/"
-	@echo "  make build              production MMG → mmg/ (+ root 404.html)"
+	@echo "  make build              production SPA → mmg/ + quests/ (+ root 404.html)"
 	@echo "  make preview            preview production MMG build"
 	@echo "  make import-osrs-db     download DuckDB + manifest into data/osrs-mmg/"
 	@echo "  make download-osrs-skill-icons  fetch skill icons into mmg-app/public/"
@@ -24,6 +24,7 @@ help: ## Show targets
 	@echo "  http://127.0.0.1:$(PORT)/                 landing"
 	@echo "  http://127.0.0.1:$(PORT)/sotetseg/        sotetseg maze trainer"
 	@echo "  http://127.0.0.1:$(PORT)/mmg/             money makers (after make build)"
+	@echo "  http://127.0.0.1:$(PORT)/quests/          quest graph (after make build)"
 
 install: ## Install MMG app dependencies (bun)
 	cd $(MMG_APP) && bun install
@@ -31,9 +32,12 @@ install: ## Install MMG app dependencies (bun)
 dev: ## Vite dev server for MMG (loads .env.dev)
 	cd $(MMG_APP) && bun run dev
 
-build: ## Production MMG build → mmg/; loads .env.prod
+build: ## Production SPA → mmg/ + quests/; loads .env.prod
 	cd $(MMG_APP) && bun run build
+	mkdir -p quests
 	cp mmg/index.html mmg/404.html
+	cp mmg/index.html quests/index.html
+	cp mmg/index.html quests/404.html
 	cp mmg/index.html 404.html
 
 preview: ## Preview production MMG build
@@ -46,7 +50,7 @@ serve: ## Local HTTP server for repo root; open http://127.0.0.1:8883/
 	@echo "Serving . on http://127.0.0.1:$(PORT)/"
 	@echo "  sotetseg: http://127.0.0.1:$(PORT)/sotetseg/"
 	@echo "  mmg:      http://127.0.0.1:$(PORT)/mmg/"
-	@echo "  quests:   http://127.0.0.1:$(PORT)/mmg/q"
+	@echo "  quests:   http://127.0.0.1:$(PORT)/quests/"
 	python3 -m http.server $(PORT) --bind 127.0.0.1
 
 import-osrs-db: ## Download OSRS DuckDB + manifest into gitignored data/osrs-mmg/

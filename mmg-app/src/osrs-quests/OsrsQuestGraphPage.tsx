@@ -100,7 +100,7 @@ export default function OsrsQuestGraphPage() {
   }, [graph, indexed, focus]);
 
   function selectNode(nodeId: string) {
-    navigate(`/q/${encodeURIComponent(nodeId)}`);
+    navigate(`/quests/${encodeURIComponent(nodeId)}`);
   }
 
   async function runWom(mode: "load" | "refresh") {
@@ -154,7 +154,7 @@ export default function OsrsQuestGraphPage() {
           <h1>Quest graph</h1>
         </header>
         <p className="osrs-quest__error">Unknown node {focusId}.</p>
-        <button type="button" className="osrs-mmg__btn" onClick={() => navigate("/q")}>
+        <button type="button" className="osrs-mmg__btn" onClick={() => navigate("/quests")}>
           Back to default
         </button>
       </div>
@@ -171,8 +171,8 @@ export default function OsrsQuestGraphPage() {
           <h1>Quest graph</h1>
           <nav className="osrs-mmg__header-nav" aria-label="Page links">
             <a href="/">Home</a>
-            <Link to="/">Money makers</Link>
-            <Link to="/c">Character</Link>
+            <Link to="/mmg">Money makers</Link>
+            <Link to="/mmg/c">Character</Link>
           </nav>
         </div>
         <p>

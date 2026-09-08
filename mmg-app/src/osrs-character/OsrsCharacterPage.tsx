@@ -138,7 +138,7 @@ export default function OsrsCharacterPage() {
           <h1>OSRS Character</h1>
           <nav className="osrs-mmg__header-nav" aria-label="Page links">
             <a href="/">Home</a>
-            <Link to="/q">Quests</Link>
+            <Link to="/quests">Quests</Link>
           </nav>
         </div>
         <p>
@@ -213,7 +213,7 @@ export default function OsrsCharacterPage() {
           >
             {showRaw ? "Hide" : "Show"} raw JSON
           </button>
-          <Link className="osrs-mmg__btn osrs-mmg__btn--ghost" to="/">
+          <Link className="osrs-mmg__btn osrs-mmg__btn--ghost" to="/mmg">
             Rankings
           </Link>
           <input

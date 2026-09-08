@@ -120,7 +120,7 @@ export default function OsrsMmgCalculatorPage() {
     return (
       <div className="osrs-mmg">
         <p className="osrs-mmg__banner osrs-mmg__banner--error">{loadError}</p>
-        <Link to="/">Back to rankings</Link>
+        <Link to="/mmg">Back to rankings</Link>
       </div>
     );
   }
@@ -135,8 +135,8 @@ export default function OsrsMmgCalculatorPage() {
         <div className="osrs-mmg__header-row">
           <h1>{formatWikiPlainText(activeGuide.methodName)}</h1>
           <nav className="osrs-mmg__header-nav" aria-label="Page links">
-            <Link to="/">← Rankings</Link>
-            <Link to="/q">Quests</Link>
+            <Link to="/mmg">← Rankings</Link>
+            <Link to="/quests">Quests</Link>
             <a href="/">Home</a>
           </nav>
         </div>

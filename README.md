@@ -10,7 +10,7 @@ Static Old School RuneScape tools. GitHub Pages serves the repo root.
 | `/sotetseg/` | Maze trainer (`index.html`, `sotetseg.js`, `style.css`) |
 | `/mmg/` | Money maker rankings, calculator, and character lookup (Vite build) |
 | `/mmg/c` | Character page (Wise Old Man) |
-| `/mmg/q` | Quest / skill dependency graph |
+| `/quests/` | Quest / skill dependency graph |
 
 ## Sotetseg maze trainer
 
@@ -18,11 +18,11 @@ Copied from [deon9718/deon9718.github.io](https://github.com/deon9718/deon9718.g
 
 ## Money makers
 
-React + Vite app in `mmg-app/`. Production output is committed to `mmg/` so GitHub Pages can serve it without CI. Deep links (`/mmg/c`, `/mmg/m/:id`) use root `404.html` (a copy of the MMG index).
+React + Vite app in `mmg-app/`. Production output is committed to `mmg/` (scripts + money-maker pages) and `quests/index.html` (same SPA, `/quests/` URL). Deep links (`/mmg/c`, `/mmg/m/:id`, `/quests/:id`) use root `404.html`.
 
 Live data comes from the public S3 prefix `prod-public-mindtricks-data` (`osrs-mmg.duckdb`). The bucket CORS allow-list must include `https://osrs.nicapotato.com` (see `fullstack-ai-app` `terraform/deploy/public-software-s3/env/prod.tfvars`).
 
-After you change `mmg-app/`, run `make build` and commit `mmg/` plus root `404.html`. GitHub Pages has no build step.
+After you change `mmg-app/`, run `make build` and commit `mmg/`, `quests/`, and root `404.html`. GitHub Pages has no build step.
 
 ## Quest graph
 
@@ -30,7 +30,9 @@ Static graph built from [Module:Questreq/data](https://oldschool.runescape.wiki/
 
 Wiki content is CC BY-NC-SA 3.0.
 
-`make serve` is a plain static server: `/mmg/c` and `/mmg/m/:id` 404 locally. Use `make dev` for those routes, or rely on GitHub Pages `404.html` in production. Local `make serve` also cannot fetch S3 (localhost is not a CORS origin) — `make dev` uses `data/osrs-mmg/` instead.
+`make serve` is a plain static server: `/mmg/c`, `/mmg/m/:id`, and `/quests/:id` 404 locally. Use `make dev` for those routes, or rely on GitHub Pages `404.html` in production. Local `make serve` also cannot fetch S3 (localhost is not a CORS origin) — `make dev` uses `data/osrs-mmg/` instead.
+
+`make dev` serves the SPA at `http://127.0.0.1:5174/mmg` and `http://127.0.0.1:5174/quests`.
 
 ## Local
 
@@ -41,7 +43,7 @@ Wiki content is CC BY-NC-SA 3.0.
 | `make kill-port` | Free port 8883 |
 | `make install` | Install MMG app dependencies (bun) |
 | `make dev` | Vite MMG app on `http://127.0.0.1:5174/` |
-| `make build` | Write `mmg/` + root `404.html` |
+| `make build` | Write `mmg/` + `quests/` + root `404.html` |
 | `make import-osrs-db` | Download DuckDB + manifest into gitignored `data/osrs-mmg/` |
 | `make download-osrs-skill-icons` | Fetch skill icons into `mmg-app/public/osrs-assets/` |
 | `make build-quest-graph` | Refresh quest `graph.json` from the OSRS Wiki |

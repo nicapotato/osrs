@@ -367,7 +367,7 @@ export default function OsrsMmgRankingsPage() {
           <h1>OSRS Money Maker Rankings</h1>
           <nav className="osrs-mmg__header-nav" aria-label="Page links">
             <a href="/">Home</a>
-            <Link to="/q">Quests</Link>
+            <Link to="/quests">Quests</Link>
           </nav>
         </div>
         <p>Adjust kph, toggle methods, then Save. Click a method for the calculator.</p>
@@ -520,7 +520,7 @@ export default function OsrsMmgRankingsPage() {
                         {rankLabel}.{" "}
                       </span>
                     : null}
-                    <Link to={`/m/${row.method_id}`}>{row.method_name}</Link>
+                    <Link to={`/mmg/m/${row.method_id}`}>{row.method_name}</Link>
                   </td>
                   <td className="osrs-mmg__type-cell">{formatMethodCategories(row.categories)}</td>
                   <td className="osrs-mmg__skills-cell">
