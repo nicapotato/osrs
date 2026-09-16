@@ -32,6 +32,7 @@ help: ## Show targets
 	@echo "  http://127.0.0.1:$(PAGES_PORT)/sotetseg/        sotetseg maze trainer"
 	@echo "  http://127.0.0.1:$(VITE_PORT)/mmg               money makers (Vite)"
 	@echo "  http://127.0.0.1:$(VITE_PORT)/quests            quest graph (Vite)"
+	@echo "  http://127.0.0.1:$(VITE_PORT)/quests/network    quest network (Vite)"
 	@echo "  http://127.0.0.1:$(PAGES_PORT)/mmg/             money makers (after make build)"
 	@echo "  http://127.0.0.1:$(PAGES_PORT)/quests/          quest graph (after make build)"
 
@@ -42,16 +43,18 @@ serve-vite: ## Vite app for /mmg and /quests (loads .env.dev)
 	@echo "Vite app on http://127.0.0.1:$(VITE_PORT)/"
 	@echo "  mmg:    http://127.0.0.1:$(VITE_PORT)/mmg"
 	@echo "  quests: http://127.0.0.1:$(VITE_PORT)/quests"
+	@echo "  map:    http://127.0.0.1:$(VITE_PORT)/quests/network"
 	cd $(MMG_APP) && bun run dev -- --port $(VITE_PORT) --strictPort
 
 dev: serve-vite ## Alias for serve-vite
 
 build: ## Production SPA → mmg/ + quests/; loads .env.prod
 	cd $(MMG_APP) && bun run build
-	mkdir -p quests
+	mkdir -p quests/network
 	cp mmg/index.html mmg/404.html
 	cp mmg/index.html quests/index.html
 	cp mmg/index.html quests/404.html
+	cp mmg/index.html quests/network/index.html
 	cp mmg/index.html 404.html
 
 preview: ## Preview production MMG build
@@ -76,6 +79,7 @@ serve-pages: ## Landing + sotetseg (static HTML at repo root)
 	@echo "  sotetseg: http://127.0.0.1:$(PAGES_PORT)/sotetseg/"
 	@echo "  mmg:      http://127.0.0.1:$(PAGES_PORT)/mmg/     (after make build)"
 	@echo "  quests:   http://127.0.0.1:$(PAGES_PORT)/quests/  (after make build)"
+	@echo "  network:  http://127.0.0.1:$(PAGES_PORT)/quests/network/  (after make build)"
 	python3 -m http.server $(PAGES_PORT) --bind 127.0.0.1
 
 serve-sote: serve-pages ## Alias for serve-pages (sotetseg lives at /sotetseg/)

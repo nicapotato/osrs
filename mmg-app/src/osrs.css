@@ -1998,6 +1998,7 @@ html:has(.osrs-app) #root {
   stroke: #8a7048;
   stroke-width: 1.4;
   opacity: 0.7;
+  pointer-events: none;
 }
 
 .osrs-quest__edge--skill {
@@ -2005,8 +2006,97 @@ html:has(.osrs-app) #root {
   stroke: #4f6b3a;
 }
 
+.osrs-quest__edge--highlight {
+  opacity: 1;
+  stroke: #c45c12;
+  stroke-width: 3.2;
+}
+
+.osrs-quest__edge--skill.osrs-quest__edge--highlight {
+  stroke: #c45c12;
+}
+
+.osrs-quest__edge--dim {
+  opacity: 0.07;
+}
+
 .osrs-quest__node {
   cursor: pointer;
+}
+
+.osrs-quest__node--muted {
+  opacity: 0.16;
+}
+
+.osrs-quest__hull {
+  pointer-events: none;
+}
+
+.osrs-quest__hull-label {
+  font-size: 10px;
+  font-weight: 700;
+  fill: #5c4a32;
+  pointer-events: none;
+}
+
+.osrs-quest__rail-line {
+  stroke: #4f6b3a;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.osrs-quest__rail-level {
+  font-size: 8px;
+  fill: #5c4a32;
+  pointer-events: none;
+}
+
+.osrs-quest__rail-tick {
+  cursor: pointer;
+}
+
+.osrs-quest__empty {
+  margin: 1.25rem 1rem;
+  color: var(--osrs-text-muted);
+}
+
+.osrs-quest__menu {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.4rem 0.35rem 0.35rem;
+  border: 1px solid var(--osrs-border-strong);
+  background: #f4ead0;
+  box-shadow: 0 6px 0 rgba(26, 18, 8, 0.12);
+}
+
+.osrs-quest__menu-title {
+  margin: 0 0.35rem 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #3d2f1c;
+}
+
+.osrs-quest__menu button,
+.osrs-quest__menu a {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.32rem 0.4rem;
+  border: 0;
+  background: transparent;
+  color: var(--osrs-text);
+  text-align: left;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.osrs-quest__menu button:hover,
+.osrs-quest__menu a:hover {
+  background: var(--osrs-btn-active-bg);
 }
 
 .osrs-quest__node-label {
@@ -2155,6 +2245,11 @@ html:has(.osrs-app) #root {
 .osrs-quest__legend-ring--locked {
   border-color: #8a3030;
   border-width: 2px;
+}
+
+.osrs-quest__legend-ring--highlight {
+  border-color: #c45c12;
+  border-width: 3px;
 }
 
 

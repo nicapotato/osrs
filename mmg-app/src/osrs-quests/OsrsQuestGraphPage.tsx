@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -7,8 +7,11 @@ import { OsrsMmgSkillIcons } from "../osrs-mmg/OsrsMmgSkillIcons";
 import type { SkillRequirement } from "../osrs-mmg/types";
 import type { CharacterProfile } from "../osrs-character/types";
 import { loadWomPlayer, refreshWomPlayer, WomApiError } from "../osrs-character/womClient";
+import { QUESTS_NETWORK_PATH, questPath } from "../routes";
+import { useQuestGraphSelection } from "./graphInteraction";
 import { QuestGraphLegend } from "./QuestGraphLegend";
 import { QuestGraphSvg } from "./QuestGraphSvg";
+import { QuestNodeMenu } from "./QuestNodeMenu";
 import { QuestPicker } from "./QuestPicker";
 import { loadQuestGraph } from "./loadGraph";
 import { indexGraph, wikiUrl } from "./neighborhood";
@@ -101,9 +104,15 @@ export default function OsrsQuestGraphPage() {
     return reqs;
   }, [graph, indexed, focus]);
 
-  function selectNode(nodeId: string) {
-    navigate(`/quests/${encodeURIComponent(nodeId)}`);
-  }
+  const selectNode = useCallback((nodeId: string) => {
+    navigate(questPath(nodeId));
+  }, [navigate]);
+
+  const selection = useQuestGraphSelection(selectNode);
+
+  useEffect(() => {
+    selection.clear();
+  }, [focusId]);
 
   async function runWom(mode: "load" | "refresh") {
     setWomLoading(true);
@@ -128,6 +137,12 @@ export default function OsrsQuestGraphPage() {
     if (!focus || !isCompletableNode(focus)) return;
     const next = toggleCompletedQuest(profile?.username, focus.id);
     setCompleted(new Set(next));
+  }
+
+  function onToggleNodeDone(nodeId: string) {
+    const node = indexed?.nodesById.get(nodeId);
+    if (!node || !isCompletableNode(node)) return;
+    setCompleted(new Set(toggleCompletedQuest(profile?.username, nodeId)));
   }
 
   if (error) {
@@ -165,6 +180,11 @@ export default function OsrsQuestGraphPage() {
 
   const incoming = indexed.incoming.get(focus.id) ?? [];
   const outgoing = indexed.outgoing.get(focus.id) ?? [];
+  const menu = selection.menu;
+  const menuNode = menu ? indexed.nodesById.get(menu.nodeId) : null;
+  if (menu && !menuNode) {
+    throw new Error(`quest graph: menu missing ${menu.nodeId}`);
+  }
 
   return (
     <div className="osrs-mmg osrs-quest">
@@ -176,6 +196,7 @@ export default function OsrsQuestGraphPage() {
               <a href="/">Home</a>
               <Link to="/mmg">Money makers</Link>
               <Link to="/mmg/c">Character</Link>
+              <Link to={QUESTS_NETWORK_PATH}>Full map</Link>
             </nav>
           </div>
         </header>
@@ -261,9 +282,24 @@ export default function OsrsQuestGraphPage() {
           <QuestGraphSvg
             graph={graph}
             focusId={focus.id}
+            highlightId={selection.highlightId}
             statusById={statusById}
-            onSelect={selectNode}
+            onNodeClick={selection.onNodeClick}
+            onNodeMenu={selection.onNodeMenu}
+            onNodeFocus={selection.onNodeFocus}
+            onBackgroundClick={selection.clear}
           />
+          {menu && menuNode ? (
+            <QuestNodeMenu
+              node={menuNode}
+              x={menu.x}
+              y={menu.y}
+              completed={completed.has(menu.nodeId)}
+              onFocus={() => selection.onNodeFocus(menu.nodeId)}
+              onToggleDone={() => onToggleNodeDone(menu.nodeId)}
+              onClose={selection.closeMenu}
+            />
+          ) : null}
         </div>
       </div>
 

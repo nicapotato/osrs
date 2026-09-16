@@ -1,4 +1,4 @@
-export function QuestGraphLegend() {
+export function QuestGraphLegend({ variant = "neighborhood" }: { variant?: "neighborhood" | "network" }) {
   return (
     <aside className="osrs-quest__legend" aria-label="Quest graph legend">
       <p className="osrs-quest__legend-title">Legend</p>
@@ -36,6 +36,9 @@ export function QuestGraphLegend() {
               Colored left bar is the storyline / series
             </li>
             <li>Subtitle shows the chain name and chapter</li>
+            {variant === "network" ? (
+              <li>Shaded boxes group a storyline on the full map</li>
+            ) : null}
           </ul>
         </div>
         <div className="osrs-quest__legend-group">
@@ -49,6 +52,9 @@ export function QuestGraphLegend() {
               <span className="osrs-quest__legend-line osrs-quest__legend-line--skill" aria-hidden />
               Dashed: skill or other level
             </li>
+            {variant === "network" ? (
+              <li>Side rails are skills by level (1 at top, 99 at bottom)</li>
+            ) : null}
           </ul>
         </div>
         <div className="osrs-quest__legend-group">
@@ -68,8 +74,14 @@ export function QuestGraphLegend() {
             </li>
             <li>
               <span className="osrs-quest__legend-swatch osrs-quest__legend-swatch--focus" />
-              Selected node
+              Focused node
             </li>
+            <li>
+              <span className="osrs-quest__legend-ring osrs-quest__legend-ring--highlight" />
+              Click: focus node and connections
+            </li>
+            <li>Right-click: wiki and complete</li>
+            <li>Double-click: open neighborhood</li>
           </ul>
         </div>
       </div>

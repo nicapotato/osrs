@@ -1,6 +1,7 @@
 export const MMG_PATH = "/mmg";
 export const CHARACTER_PATH = "/mmg/c";
 export const QUESTS_PATH = "/quests";
+export const QUESTS_NETWORK_PATH = "/quests/network";
 
 export function methodPath(methodId: string): string {
   return `/mmg/m/${methodId}`;

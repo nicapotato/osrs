@@ -64,11 +64,11 @@ function walk(
   return dist;
 }
 
-function nodeWidth(label: string, extra = 0): number {
+export function questNodeWidth(label: string, extra = 0): number {
   return Math.max(132, Math.min(236, 28 + label.length * 7.2 + extra));
 }
 
-function nodeHeight(category: QuestGraphNode["category"]): number {
+export function questNodeHeight(category: QuestGraphNode["category"]): number {
   return category === "skill" || category === "quest_points" || category === "kudos" || category === "resource" || category === "combat"
     ? SKILL_NODE_HEIGHT
     : QUEST_NODE_HEIGHT;
@@ -166,8 +166,8 @@ export function layoutNeighborhood(graph: QuestGraph, focusId: string): {
     bucket.forEach((node) => {
       const skillReq = skillReqForNode(node, graph.edges, focusId, visibleIds);
       const extra = skillReq ? (skillReq.levelText.length > 3 ? 46 : 36) : 0;
-      const width = nodeWidth(node.label, extra);
-      const height = nodeHeight(node.category);
+      const width = questNodeWidth(node.label, extra);
+      const height = questNodeHeight(node.category);
       laid.push({
         ...node,
         x: colX,
