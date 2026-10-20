@@ -22,10 +22,12 @@ class LuaTableParser:
         ch = self.source[self.i]
         if ch == "{":
             return self._parse_table()
+        if ch == "(":
+            return self._parse_paren_expr()
         if ch in "'\"":
             return self._parse_string()
         if ch.isdigit() or (ch == "-" and self._peek_is_digit()):
-            return self._parse_number()
+            return self._parse_additive()
         if ch.isalpha() or ch == "_":
             ident = self._parse_ident()
             if ident == "true":
@@ -126,6 +128,56 @@ class LuaTableParser:
             self.i += 1
         raise LuaTableError("unterminated string")
 
+    def _parse_paren_expr(self) -> int | float:
+        assert self.source[self.i] == "("
+        self.i += 1
+        value = self._parse_additive()
+        self._skip()
+        if self.i >= self.n or self.source[self.i] != ")":
+            raise LuaTableError(f"expected ')' in expression at {self.i}")
+        self.i += 1
+        return value
+
+    def _parse_additive(self) -> int | float:
+        left = self._parse_multiplicative()
+        while True:
+            self._skip()
+            if self.i >= self.n or self.source[self.i] not in "+-":
+                return left
+            op = self.source[self.i]
+            self.i += 1
+            right = self._parse_multiplicative()
+            left = left + right if op == "+" else left - right
+
+    def _parse_multiplicative(self) -> int | float:
+        left = self._parse_unary_number()
+        while True:
+            self._skip()
+            if self.i >= self.n or self.source[self.i] not in "*/":
+                return left
+            op = self.source[self.i]
+            self.i += 1
+            right = self._parse_unary_number()
+            if op == "*":
+                left = left * right
+            else:
+                if right == 0:
+                    raise LuaTableError("division by zero")
+                left = left / right
+
+    def _parse_unary_number(self) -> int | float:
+        self._skip()
+        if self.i >= self.n:
+            raise LuaTableError("unexpected end of expression")
+        if self.source[self.i] == "(":
+            return self._parse_paren_expr()
+        if self.source[self.i] == "-":
+            self.i += 1
+            return -self._parse_unary_number()
+        if self.source[self.i].isdigit():
+            return self._parse_number()
+        raise LuaTableError(f"expected number in expression at {self.i}")
+
     def _parse_number(self) -> int | float:
         start = self.i
         if self.source[self.i] == "-":
@@ -158,6 +210,32 @@ class LuaTableParser:
                     self.i += 1
                 continue
             return
+
+
+def extract_return_table(source: str) -> Any:
+    text = source
+    fence = text.find("```")
+    if fence != -1:
+        start = text.find("\n", fence)
+        end = text.find("```", start + 1)
+        if start == -1 or end == -1:
+            raise LuaTableError("could not unwrap markdown-fenced Lua")
+        text = text[start + 1 : end]
+
+    idx = 0
+    last_error: LuaTableError | None = None
+    while True:
+        pos = text.find("return", idx)
+        if pos == -1:
+            if last_error is not None:
+                raise last_error
+            raise LuaTableError("missing `return` assignment")
+        parser = LuaTableParser(text[pos + len("return") :])
+        try:
+            return parser.parse_value()
+        except LuaTableError as exc:
+            last_error = exc
+            idx = pos + len("return")
 
 
 def extract_questreq_table(source: str) -> dict[str, Any]:

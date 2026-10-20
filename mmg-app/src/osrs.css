@@ -90,10 +90,6 @@ html:has(.osrs-app) #root {
   overflow-y: auto;
 }
 
-.osrs-app:has(.osrs-quest) .osrs-app__scroll::after {
-  display: none;
-}
-
 .osrs-app__scroll::before,
 .osrs-app__scroll::after {
   content: "";
@@ -119,6 +115,17 @@ html:has(.osrs-app) #root {
   bottom: -11px;
   background-image: url("./theme/scroll-bottom.gif");
   background-position: center bottom;
+}
+
+.osrs-app:has(.osrs-character) .osrs-app__scroll {
+  padding-bottom: 0.85rem;
+}
+
+.osrs-app:has(.osrs-quest) .osrs-app__scroll::after,
+.osrs-app:has(.osrs-character) .osrs-app__scroll::after {
+  content: none;
+  display: none;
+  background-image: none;
 }
 
 .osrs-mmg {
@@ -1903,6 +1910,43 @@ html:has(.osrs-app) #root {
   grid-column: span 2;
 }
 
+.osrs-quest__kinds {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.osrs-quest__kinds legend {
+  padding: 0;
+  font-size: 0.72rem;
+  color: var(--osrs-text-muted);
+}
+
+.osrs-quest__kinds-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.75rem;
+}
+
+.osrs-quest__kinds-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.osrs-quest__kinds input[type="checkbox"] {
+  width: 0.9rem;
+  height: 0.9rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--osrs-border);
+  accent-color: #4f6b3a;
+}
+
 .osrs-quest__picker {
   position: relative;
 }
@@ -1987,17 +2031,233 @@ html:has(.osrs-app) #root {
   background: rgba(244, 234, 208, 0.35);
 }
 
+.osrs-quest__canvas--heatmap {
+  display: flex;
+  min-height: min(70dvh, 44rem);
+}
+
+.osrs-quest__heatmap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 18.5rem);
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.osrs-quest__heatmap-scroll {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.osrs-quest__heatmap-table {
+  border-collapse: separate;
+  border-spacing: 1px;
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.osrs-quest__heatmap-table th,
+.osrs-quest__heatmap-table td {
+  padding: 0;
+  vertical-align: stretch;
+}
+
+.osrs-quest__heatmap-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #efe3c4;
+}
+
+.osrs-quest__heatmap-table thead th:first-child,
+.osrs-quest__heatmap-table tbody th,
+.osrs-quest__heatmap-table tfoot th {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #efe3c4;
+}
+
+.osrs-quest__heatmap-table thead th:first-child {
+  z-index: 4;
+}
+
+.osrs-quest__heatmap-corner,
+.osrs-quest__heatmap-total,
+.osrs-quest__heatmap-table tfoot th,
+.osrs-quest__heatmap-table tfoot td {
+  background: #efe3c4;
+  color: var(--osrs-text-muted);
+  font-weight: 600;
+  text-align: center;
+  padding: 0.2rem 0.35rem;
+  white-space: nowrap;
+}
+
+.osrs-quest__heatmap-table tbody th {
+  min-width: 7.6rem;
+}
+
+.osrs-quest__heatmap-rowbtn,
+.osrs-quest__heatmap-colbtn,
+.osrs-quest__heatmap-cell {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.osrs-quest__heatmap-rowbtn {
+  gap: 0.35rem;
+  padding: 0.18rem 0.4rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.osrs-quest__heatmap-rowbtn img {
+  flex: 0 0 auto;
+}
+
+.osrs-quest__heatmap-colbtn {
+  min-width: 1.85rem;
+  height: 8.2rem;
+  padding: 0.4rem 0.12rem 0.25rem;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.osrs-quest__heatmap-colbtn-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+
+.osrs-quest__heatmap-colswatch {
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: 0 0 auto;
+  border-radius: 1px;
+  border: 1px solid rgba(26, 18, 8, 0.25);
+}
+
+.osrs-quest__heatmap-cell {
+  justify-content: center;
+  min-width: 1.7rem;
+  min-height: 1.45rem;
+  padding: 0.12rem 0.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.osrs-quest__heatmap-cell:hover,
+.osrs-quest__heatmap-rowbtn:hover,
+.osrs-quest__heatmap-colbtn:hover {
+  outline: 1px solid #1a1208;
+  outline-offset: -1px;
+}
+
+.osrs-quest__heatmap-cell--on,
+.osrs-quest__heatmap-head--on .osrs-quest__heatmap-colbtn,
+.osrs-quest__heatmap-row--on .osrs-quest__heatmap-rowbtn {
+  outline: 2px solid #7b4f17;
+  outline-offset: -2px;
+}
+
+.osrs-quest__heatmap-panel {
+  min-width: 0;
+  overflow: auto;
+  padding: 0.7rem 0.75rem;
+  border-left: 1px solid var(--osrs-border);
+  background: rgba(239, 227, 196, 0.55);
+}
+
+.osrs-quest__heatmap-panel-title {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+}
+
+.osrs-quest__heatmap-panel-meta,
+.osrs-quest__heatmap-panel-hint {
+  margin: 0 0 0.65rem;
+  color: var(--osrs-text-muted);
+  font-size: 0.82rem;
+}
+
+.osrs-quest__heatmap-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.osrs-quest__heatmap-quest {
+  display: block;
+}
+
+.osrs-quest__heatmap-quest-meta {
+  display: block;
+  color: var(--osrs-text-muted);
+  font-size: 0.75rem;
+}
+
 .osrs-quest__svg {
   width: 100%;
   height: 100%;
   cursor: grab;
 }
 
+.osrs-quest__svg--pack {
+  cursor: pointer;
+  background: rgba(232, 217, 184, 0.45);
+}
+
+.osrs-quest__pack-node {
+  stroke-width: 1.2;
+}
+
+.osrs-quest__pack-node--family {
+  fill-opacity: 0.22;
+}
+
+.osrs-quest__pack-node--leaf {
+  fill-opacity: 0.94;
+}
+
+.osrs-quest__pack-node:hover {
+  stroke: #1a1208;
+  stroke-width: 2;
+}
+
+.osrs-quest__pack-label {
+  fill: #2a1c0c;
+  font-weight: 700;
+  paint-order: stroke fill;
+  stroke: #f4ead0;
+  stroke-width: 3px;
+}
+
+.osrs-quest__pack-crumb {
+  font-size: 12px;
+  font-weight: 700;
+  fill: #5c4a32;
+  pointer-events: none;
+}
+
 .osrs-quest__edge {
   fill: none;
   stroke: #8a7048;
-  stroke-width: 1.4;
-  opacity: 0.7;
+  stroke-width: 1.8;
+  opacity: 0.78;
   pointer-events: none;
 }
 
@@ -2028,6 +2288,16 @@ html:has(.osrs-app) #root {
   opacity: 0.16;
 }
 
+.osrs-quest__edge-label {
+  font-size: 10px;
+  font-weight: 700;
+  fill: #2f4a1f;
+  paint-order: stroke fill;
+  stroke: #f4ead0;
+  stroke-width: 3px;
+  pointer-events: none;
+}
+
 .osrs-quest__hull {
   pointer-events: none;
 }
@@ -2036,6 +2306,9 @@ html:has(.osrs-app) #root {
   font-size: 10px;
   font-weight: 700;
   fill: #5c4a32;
+  paint-order: stroke fill;
+  stroke: #f4ead0;
+  stroke-width: 3px;
   pointer-events: none;
 }
 
@@ -2180,6 +2453,36 @@ html:has(.osrs-app) #root {
   border-radius: 3px;
 }
 
+.osrs-quest__legend-swatch--novice {
+  background: #b7d59a;
+  border-radius: 3px;
+}
+
+.osrs-quest__legend-swatch--intermediate {
+  background: #ead56a;
+  border-radius: 3px;
+}
+
+.osrs-quest__legend-swatch--experienced {
+  background: #e0a24a;
+  border-radius: 3px;
+}
+
+.osrs-quest__legend-swatch--master {
+  background: #d46a5a;
+  border-radius: 3px;
+}
+
+.osrs-quest__legend-swatch--grandmaster {
+  background: #9b6bb8;
+  border-radius: 3px;
+}
+
+.osrs-quest__legend-swatch--special {
+  background: #d4c4a8;
+  border-radius: 3px;
+}
+
 .osrs-quest__legend-swatch--miniquest {
   background: #efe0c0;
   border-radius: 4px;
@@ -2225,6 +2528,20 @@ html:has(.osrs-app) #root {
   border-top-color: #4f6b3a;
 }
 
+.osrs-quest__legend-line--arrow {
+  position: relative;
+  width: 1.35rem;
+}
+
+.osrs-quest__legend-line--arrow::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: -5px;
+  border: 4px solid transparent;
+  border-left-color: #8a7048;
+}
+
 .osrs-quest__legend-ring {
   border-radius: 50%;
   width: 0.7rem;
@@ -2250,6 +2567,17 @@ html:has(.osrs-app) #root {
 .osrs-quest__legend-ring--highlight {
   border-color: #c45c12;
   border-width: 3px;
+}
+
+.osrs-skill__picker {
+  flex: 0 0 auto;
+  max-height: 9.5rem;
+  overflow: auto;
+  margin: 0 0 0.4rem;
+  padding: 0.25rem;
+  list-style: none;
+  border: 1px solid var(--osrs-border-strong);
+  background: #f4ead0;
 }
 
 
@@ -2312,5 +2640,17 @@ html:has(.osrs-app) #root {
 
   .osrs-quest__legend-groups {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .osrs-quest__heatmap {
+    grid-template-columns: 1fr;
+  }
+
+  .osrs-quest__heatmap-panel {
+    max-height: 16rem;
+    border-left: 0;
+    border-top: 1px solid var(--osrs-border);
   }
 }

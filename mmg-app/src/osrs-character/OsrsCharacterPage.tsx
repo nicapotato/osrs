@@ -139,6 +139,7 @@ export default function OsrsCharacterPage() {
           <nav className="osrs-mmg__header-nav" aria-label="Page links">
             <a href="/">Home</a>
             <Link to="/quests">Quests</Link>
+            <Link to="/skills">Skills</Link>
           </nav>
         </div>
         <p>

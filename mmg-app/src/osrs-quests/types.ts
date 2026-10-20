@@ -57,3 +57,11 @@ export type QuestGraph = {
 export type QuestPlayerStatus = "done" | "ready" | "locked" | "unknown";
 
 export type MembersFilter = "all" | "members" | "f2p";
+
+export type QuestNetworkView = "pack" | "force" | "heatmap";
+
+export type HeatmapColumnMode = "series" | "difficulty";
+
+export type HeatmapMetric = "quests" | "maxLevel" | "sumLevel";
+
+export type HeatmapSort = "name" | "quests" | "levelSum" | "difficulty";

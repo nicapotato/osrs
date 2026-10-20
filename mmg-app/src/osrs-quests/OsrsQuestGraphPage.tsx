@@ -197,6 +197,7 @@ export default function OsrsQuestGraphPage() {
               <Link to="/mmg">Money makers</Link>
               <Link to="/mmg/c">Character</Link>
               <Link to={QUESTS_NETWORK_PATH}>Full map</Link>
+              <Link to="/skills">Skills</Link>
             </nav>
           </div>
         </header>

@@ -137,6 +137,7 @@ export default function OsrsMmgCalculatorPage() {
           <nav className="osrs-mmg__header-nav" aria-label="Page links">
             <Link to="/mmg">← Rankings</Link>
             <Link to="/quests">Quests</Link>
+            <Link to="/skills">Skills</Link>
             <a href="/">Home</a>
           </nav>
         </div>

@@ -19,9 +19,19 @@ import {
 } from "./questFilters";
 import { loadCompletedQuestIds, toggleCompletedQuest } from "./questProgress";
 import { QuestGraphLegend } from "./QuestGraphLegend";
+import { QuestHeatmap } from "./QuestHeatmap";
 import { QuestNetworkSvg } from "./QuestNetworkSvg";
+import { QuestPackSvg } from "./QuestPackSvg";
 import { QuestNodeMenu } from "./QuestNodeMenu";
-import type { MembersFilter, QuestGraph, QuestPlayerStatus } from "./types";
+import type {
+  HeatmapColumnMode,
+  HeatmapMetric,
+  HeatmapSort,
+  MembersFilter,
+  QuestGraph,
+  QuestNetworkView,
+  QuestPlayerStatus,
+} from "./types";
 
 function wikiCreditDate(iso: string): string {
   return new Date(iso).toLocaleString("en-GB", { dateStyle: "medium" });
@@ -35,6 +45,12 @@ export default function OsrsQuestNetworkPage() {
   const [profile, setProfile] = useState<CharacterProfile | null>(() => getActiveRankingsProfile().wom_player);
   const [usernameInput, setUsernameInput] = useState(profile?.displayName ?? "");
   const [womLoading, setWomLoading] = useState(false);
+  const [isolatedId, setIsolatedId] = useState<string | null>(null);
+  const [view, setView] = useState<QuestNetworkView>("pack");
+  const [heatmapColumns, setHeatmapColumns] = useState<HeatmapColumnMode>("series");
+  const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>("quests");
+  const [heatmapColumnSort, setHeatmapColumnSort] = useState<HeatmapSort>("levelSum");
+  const [heatmapRowSort, setHeatmapRowSort] = useState<HeatmapSort>("levelSum");
   const [completed, setCompleted] = useState<Set<string>>(
     () => loadCompletedQuestIds(getActiveRankingsProfile().wom_player?.username),
   );
@@ -80,9 +96,20 @@ export default function OsrsQuestNetworkPage() {
   );
   const selection = useQuestGraphSelection(focusNode);
 
-  useEffect(() => {
+  function onNetworkNodeClick(nodeId: string) {
+    selection.closeMenu();
+    setIsolatedId((prev) => (prev === nodeId ? null : nodeId));
+  }
+
+  function onNetworkBackground() {
+    setIsolatedId(null);
     selection.clear();
-  }, [filters]);
+  }
+
+  useEffect(() => {
+    setIsolatedId(null);
+    selection.clear();
+  }, [filters, view]);
 
   async function runWom(mode: "load" | "refresh") {
     setWomLoading(true);
@@ -145,11 +172,72 @@ export default function OsrsQuestNetworkPage() {
               <Link to="/mmg">Money makers</Link>
               <Link to="/mmg/c">Character</Link>
               <Link to={QUESTS_PATH}>Neighborhood</Link>
+              <Link to="/skills">Skills</Link>
             </nav>
           </div>
         </header>
 
         <div className="osrs-quest__toolbar">
+          <label className="osrs-mmg__field osrs-quest__field">
+            View
+            <select value={view} onChange={(event) => setView(event.target.value as QuestNetworkView)}>
+              <option value="pack">Family packing</option>
+              <option value="heatmap">Skill heatmap</option>
+              <option value="force">Force network</option>
+            </select>
+          </label>
+          {view === "heatmap" ? (
+            <>
+              <label className="osrs-mmg__field osrs-quest__field">
+                Columns
+                <select
+                  value={heatmapColumns}
+                  onChange={(event) => {
+                    const next = event.target.value as HeatmapColumnMode;
+                    setHeatmapColumns(next);
+                    setHeatmapColumnSort(next === "difficulty" ? "difficulty" : "levelSum");
+                  }}
+                >
+                  <option value="series">Storyline</option>
+                  <option value="difficulty">Difficulty</option>
+                </select>
+              </label>
+              <label className="osrs-mmg__field osrs-quest__field">
+                Cell
+                <select
+                  value={heatmapMetric}
+                  onChange={(event) => setHeatmapMetric(event.target.value as HeatmapMetric)}
+                >
+                  <option value="quests">Quest count</option>
+                  <option value="maxLevel">Max level</option>
+                  <option value="sumLevel">Sum of levels</option>
+                </select>
+              </label>
+              <label className="osrs-mmg__field osrs-quest__field">
+                Sort columns
+                <select
+                  value={heatmapColumnSort}
+                  onChange={(event) => setHeatmapColumnSort(event.target.value as HeatmapSort)}
+                >
+                  <option value="name">Name</option>
+                  <option value="quests">Quest count</option>
+                  <option value="levelSum">Level sum</option>
+                  <option value="difficulty">Difficulty</option>
+                </select>
+              </label>
+              <label className="osrs-mmg__field osrs-quest__field">
+                Sort rows
+                <select
+                  value={heatmapRowSort}
+                  onChange={(event) => setHeatmapRowSort(event.target.value as HeatmapSort)}
+                >
+                  <option value="name">Name</option>
+                  <option value="quests">Quest count</option>
+                  <option value="levelSum">Level sum</option>
+                </select>
+              </label>
+            </>
+          ) : null}
           <label className="osrs-mmg__field osrs-quest__field">
             Members
             <select
@@ -191,8 +279,58 @@ export default function OsrsQuestNetworkPage() {
               ))}
             </select>
           </label>
+          <fieldset className="osrs-mmg__field osrs-quest__field osrs-quest__kinds">
+            <legend>Type</legend>
+            <span className="osrs-quest__kinds-row">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={filters.kinds.quest}
+                  onChange={(event) =>
+                    setFilters((prev) => ({ ...prev, kinds: { ...prev.kinds, quest: event.target.checked } }))
+                  }
+                />
+                Quests
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={filters.kinds.miniquest}
+                  onChange={(event) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      kinds: { ...prev.kinds, miniquest: event.target.checked },
+                    }))
+                  }
+                />
+                Miniquests
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={filters.kinds.diary}
+                  onChange={(event) =>
+                    setFilters((prev) => ({ ...prev, kinds: { ...prev.kinds, diary: event.target.checked } }))
+                  }
+                />
+                Diaries
+              </label>
+              {view === "heatmap" ? null : (
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={filters.kinds.skill}
+                    onChange={(event) =>
+                      setFilters((prev) => ({ ...prev, kinds: { ...prev.kinds, skill: event.target.checked } }))
+                    }
+                  />
+                  Skills
+                </label>
+              )}
+            </span>
+          </fieldset>
           <p className="osrs-mmg__search-count osrs-quest__field">
-            {visibleQuestIds.size} quest{visibleQuestIds.size === 1 ? "" : "s"}
+            {visibleQuestIds.size} shown
           </p>
           <label className="osrs-mmg__field osrs-quest__field osrs-quest__field--grow">
             Wise Old Man
@@ -225,19 +363,43 @@ export default function OsrsQuestNetworkPage() {
           </label>
         </div>
 
-        <div className="osrs-quest__canvas">
+        <div className={`osrs-quest__canvas${view === "heatmap" ? " osrs-quest__canvas--heatmap" : ""}`}>
           {visibleQuestIds.size === 0 ? (
-            <p className="osrs-quest__empty">No quests match these filters.</p>
+            <p className="osrs-quest__empty">Nothing matches these filters.</p>
+          ) : view === "pack" ? (
+            <QuestPackSvg
+              graph={graph}
+              visibleQuestIds={visibleQuestIds}
+              isolatedId={isolatedId}
+              includeSkills={filters.kinds.skill}
+              statusById={statusById}
+              onNodeMenu={selection.onNodeMenu}
+              onNodeFocus={selection.onNodeFocus}
+            />
+          ) : view === "heatmap" ? (
+            <QuestHeatmap
+              graph={graph}
+              visibleQuestIds={visibleQuestIds}
+              statusById={statusById}
+              columnMode={heatmapColumns}
+              metric={heatmapMetric}
+              columnSort={heatmapColumnSort}
+              rowSort={heatmapRowSort}
+              onNodeMenu={selection.onNodeMenu}
+              onNodeFocus={selection.onNodeFocus}
+            />
           ) : (
             <QuestNetworkSvg
               graph={graph}
               visibleQuestIds={visibleQuestIds}
-              highlightId={selection.highlightId}
+              isolatedId={isolatedId}
+              highlightId={isolatedId}
+              includeSkills={filters.kinds.skill}
               statusById={statusById}
-              onNodeClick={selection.onNodeClick}
+              onNodeClick={onNetworkNodeClick}
               onNodeMenu={selection.onNodeMenu}
               onNodeFocus={selection.onNodeFocus}
-              onBackgroundClick={selection.clear}
+              onBackgroundClick={onNetworkBackground}
             />
           )}
           {menu && menuNode ? (
@@ -254,15 +416,19 @@ export default function OsrsQuestNetworkPage() {
         </div>
       </div>
 
-      <QuestGraphLegend variant="network" />
+      <QuestGraphLegend variant={view === "pack" ? "pack" : view === "heatmap" ? "heatmap" : "network"} />
 
       <p className="osrs-quest__credit">
         Wiki data {wikiCreditDate(graph.source.fetched_at)}. {graph.source.license}. Full map from{" "}
         <a href="https://oldschool.runescape.wiki/w/Module:Questreq/data" target="_blank" rel="noreferrer">
           OSRS Wiki Questreq
         </a>
-        . Skills via Wise Old Man. Quest ticks stay on this device. Click a node to focus it and its
-        connections; double-click to open its neighborhood. Right-click for wiki and complete.
+        . Skills via Wise Old Man. Quest ticks stay on this device.
+        {view === "pack"
+          ? " Click a family circle to zoom in; click the parchment to zoom out. Double-click a quest for its neighborhood. Right-click for wiki and complete."
+          : view === "heatmap"
+            ? " Darker cells are a heavier skill tax on that storyline or difficulty. Click a cell, skill, or column to list the quests. Click a name for its neighborhood; right-click for wiki and complete."
+            : " Click a node to isolate its neighborhood; click it again (or the canvas) to restore the map. Drag nodes to rearrange. Double-click opens the neighborhood page. Right-click for wiki and complete."}
       </p>
     </div>
   );

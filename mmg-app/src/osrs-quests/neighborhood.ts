@@ -40,7 +40,7 @@ export function indexGraph(graph: QuestGraph): {
   return { nodesById, incoming, outgoing };
 }
 
-function walk(
+export function walk(
   startId: string,
   step: Map<string, QuestGraphEdge[]>,
   pick: (edge: QuestGraphEdge) => string,
@@ -62,6 +62,16 @@ function walk(
     }
   }
   return dist;
+}
+
+export function neighborhoodIds(graph: QuestGraph, focusId: string): Set<string> {
+  const { nodesById, incoming, outgoing } = indexGraph(graph);
+  if (!nodesById.has(focusId)) {
+    throw new Error(`quest graph: unknown focus ${focusId}`);
+  }
+  const ancestorDist = walk(focusId, incoming, (edge) => edge.from_node_id);
+  const descendantDist = walk(focusId, outgoing, (edge) => edge.to_node_id);
+  return new Set([...ancestorDist.keys(), ...descendantDist.keys()]);
 }
 
 export function questNodeWidth(label: string, extra = 0): number {

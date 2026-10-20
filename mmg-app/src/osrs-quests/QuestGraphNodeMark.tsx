@@ -1,8 +1,8 @@
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent, PointerEvent } from "react";
 
 import { skillIconUrl } from "../osrs-mmg/skillIconUrl";
 import { categoryTitle, type LaidOutQuestNode } from "./neighborhood";
-import { isCompletableNode, seriesColor } from "./questFilters";
+import { difficultyFill, isCompletableNode, seriesColor, seriesIconUrl } from "./questFilters";
 import type { QuestGraphNode, QuestPlayerStatus } from "./types";
 
 function statusStroke(status: QuestPlayerStatus): string {
@@ -20,13 +20,21 @@ function nodeKindClass(category: QuestGraphNode["category"]): string {
   return "osrs-quest__node--other";
 }
 
-function nodeFill(node: LaidOutQuestNode, isFocus: boolean, isHighlight: boolean, isNeighbor: boolean): string {
-  if (isHighlight || isFocus) return "#f3e2a0";
-  if (isNeighbor) return "#f8efd4";
+function nodeFill(
+  node: LaidOutQuestNode,
+  isFocus: boolean,
+  isHighlight: boolean,
+  isNeighbor: boolean,
+  variant: "neighborhood" | "network",
+): string {
+  if (variant === "neighborhood" && (isHighlight || isFocus)) return "#f3e2a0";
+  if (variant === "neighborhood" && isNeighbor) return "#f8efd4";
   if (node.category === "skill") return "#cfe4b8";
   if (node.category === "miniquest") return "#efe0c0";
   if (node.category === "diary") return "#d7e3ef";
-  if (node.category === "quest") return "#f4ead0";
+  if (node.category === "quest") {
+    return variant === "network" ? difficultyFill(node.difficulty) : "#f4ead0";
+  }
   return "#e4d4f0";
 }
 
@@ -62,9 +70,13 @@ type Props = {
   isHighlight: boolean;
   isNeighbor: boolean;
   muted: boolean;
+  variant?: "neighborhood" | "network";
   onActivate: () => void;
   onMenu: (point: { clientX: number; clientY: number }) => void;
   onFocus: () => void;
+  onPointerDown?: (event: PointerEvent<SVGGElement>) => void;
+  onPointerMove?: (event: PointerEvent<SVGGElement>) => void;
+  onPointerUp?: (event: PointerEvent<SVGGElement>) => void;
 };
 
 export function QuestGraphNodeMark({
@@ -74,15 +86,22 @@ export function QuestGraphNodeMark({
   isHighlight,
   isNeighbor,
   muted,
+  variant = "neighborhood",
   onActivate,
   onMenu,
   onFocus,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
 }: Props) {
-  const showChain = isCompletableNode(node) && Boolean(node.series);
+  const network = variant === "network";
+  const showChain = !network && isCompletableNode(node) && Boolean(node.series);
+  const seriesIcon = network && isCompletableNode(node) ? seriesIconUrl(node.series) : null;
   const stripe = showChain ? 8 : 0;
-  const hasIcon = node.category === "skill" && Boolean(node.skill_key);
+  const hasSkillIcon = node.category === "skill" && Boolean(node.skill_key);
   const iconSize = 16;
-  const textX = stripe + (hasIcon ? 26 : 8);
+  const leftIcon = hasSkillIcon || Boolean(seriesIcon) || (network && isCompletableNode(node) && Boolean(node.series));
+  const textX = stripe + (leftIcon ? 26 : 8);
   const badgeW = node.skillReq ? (node.skillReq.levelText.length > 3 ? 40 : 30) : 0;
   const textMax = Math.max(8, Math.floor((node.width - textX - badgeW - 8) / 6.4));
   const title = truncateLabel(node.label, textMax);
@@ -108,8 +127,16 @@ export function QuestGraphNodeMark({
       className={className}
       onClick={(event) => {
         event.stopPropagation();
+        if (onPointerDown) return;
         onActivate();
       }}
+      onPointerDown={(event) => {
+        if (event.button !== 0) return;
+        event.stopPropagation();
+        onPointerDown?.(event);
+      }}
+      onPointerMove={(event) => onPointerMove?.(event)}
+      onPointerUp={(event) => onPointerUp?.(event)}
       onContextMenu={(event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -133,12 +160,18 @@ export function QuestGraphNodeMark({
         {node.label}
         {node.skillReq ? ` · level ${node.skillReq.levelText}` : ""}
         {node.series ? ` · ${node.series}` : ""}
+        {node.difficulty ? ` · ${node.difficulty}` : ""}
       </title>
       <clipPath id={clipId}>
         <rect width={node.width} height={node.height} rx={radius} />
       </clipPath>
       <g clipPath={`url(#${clipId})`}>
-        <rect width={node.width} height={node.height} rx={radius} fill={nodeFill(node, isFocus, isHighlight, isNeighbor)} />
+        <rect
+          width={node.width}
+          height={node.height}
+          rx={radius}
+          fill={nodeFill(node, isFocus, isHighlight, isNeighbor, variant)}
+        />
         {showChain ? <rect width={8} height={node.height} fill={seriesColor(node.series)} /> : null}
       </g>
       <rect
@@ -149,13 +182,25 @@ export function QuestGraphNodeMark({
         stroke={isHighlight ? "#c45c12" : isNeighbor ? "#c45c12" : isFocus ? "#7b4f17" : statusStroke(status)}
         strokeWidth={isHighlight ? 3.8 : isNeighbor ? 2.5 : isFocus ? 2.6 : 1.7}
       />
-      {hasIcon && node.skill_key ? (
+      {hasSkillIcon && node.skill_key ? (
         <image
           href={skillIconUrl(node.skill_key)}
           x={stripe + 6}
           y={(node.height - iconSize) / 2}
           width={iconSize}
           height={iconSize}
+        />
+      ) : null}
+      {seriesIcon ? (
+        <image href={seriesIcon} x={6} y={(node.height - iconSize) / 2} width={iconSize} height={iconSize} />
+      ) : network && isCompletableNode(node) && node.series ? (
+        <rect
+          x={6}
+          y={(node.height - iconSize) / 2}
+          width={iconSize}
+          height={iconSize}
+          rx={3}
+          fill={seriesColor(node.series)}
         />
       ) : null}
       <text className="osrs-quest__node-label">
